@@ -18,8 +18,8 @@ pub struct BatchdownloadfileFileListRequestItem {
 
 #[derive(Serialize)]
 pub struct BatchdownloadfileRequestBody {
-    env: String,
-    file_list: Vec<BatchdownloadfileFileListRequestItem>,
+    pub env: String,
+    pub file_list: Vec<BatchdownloadfileFileListRequestItem>,
 }
 
 #[derive(Deserialize)]
