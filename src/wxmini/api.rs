@@ -10,19 +10,19 @@ wxmini_api_get!(
     AccessTokenData
 );
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct BatchdownloadfileFileListRequestItem {
     pub fileid: String,
     pub max_age: u32,
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct BatchdownloadfileRequestBody {
     pub env: String,
     pub file_list: Vec<BatchdownloadfileFileListRequestItem>,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct BatchdownloadfileFileListResponseItem {
     pub fileid: String,
     pub download_url: String,
@@ -30,7 +30,7 @@ pub struct BatchdownloadfileFileListResponseItem {
     pub errmsg: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct BatchdownloadfileResponseData {
     pub file_list: Vec<BatchdownloadfileFileListResponseItem>,
 }

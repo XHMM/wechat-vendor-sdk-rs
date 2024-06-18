@@ -2,7 +2,7 @@
 //! 企业微信相关接口
 //!
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{common::AccessTokenData, wxcorp_api_get};
 
@@ -15,7 +15,7 @@ wxcorp_api_get!(
 );
 
 /// 接口响应的数据信息。（企业微信开发文档里写的是 snake_case，但实际开发返回的却是 PascalCase，汗颜）
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged, rename_all_fields(deserialize = "PascalCase"))]
 pub enum UserIdInfoByAuthCode {
     Inner {
@@ -34,7 +34,7 @@ wxcorp_api_get!(
     UserIdInfoByAuthCode
 );
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct UserInfo {
     pub userid: String,
     pub name: Option<String>,
