@@ -1,0 +1,6 @@
+# 如果使用的是海外机器构建，这里无需替换成国内镜像，则注释掉
+[source.crates-io]
+replace-with = 'mirror'
+
+[source.mirror]
+registry = "sparse+https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/"
