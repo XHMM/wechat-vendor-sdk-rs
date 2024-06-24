@@ -68,7 +68,12 @@ where
 {
     let client = reqwest::Client::new();
     let response = client.post(url).query(query).json(body).send().await?;
-    let data: Value = response.json().await?;
+    let text = response.text().await?;
+    let data: Value = serde_json::from_str(&text).map_err(|err| {
+        trace!("decode json error: {}, raw text: {}", err, text);
+        err
+    })?;
+
     trace!("wxmini api post response: {:?}", data);
 
     if data["errcode"] == 0 || data["errcode"].is_null() {
