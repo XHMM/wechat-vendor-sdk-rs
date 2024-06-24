@@ -1,3 +1,5 @@
+//! 存放公用内容
+//!
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]

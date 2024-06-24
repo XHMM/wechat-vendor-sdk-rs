@@ -39,7 +39,7 @@ wxmini_api_post!(
     /// [获取文件下载链接](https://developers.weixin.qq.com/miniprogram/dev/wxcloudrun/src/development/storage/service/download.html)
     request_batch_download_file,
     "https://api.weixin.qq.com/tcb/batchdownloadfile",
-    (access_token: &str),
+    (access_token: Option<&str>),
     &BatchdownloadfileRequestBody,
     BatchdownloadfileResponseData
 );
@@ -69,7 +69,7 @@ wxmini_api_post!(
     /// [音视频内容安全识别](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/sec-center/sec-check/mediaCheckAsync.html)
     request_media_sec_check,
     "http://api.weixin.qq.com/wxa/media_check_async",
-    (access_token: &str),
+    (access_token: Option<&str>),
     &MediaSecCheckBody,
     MediaSecCheckResponseData
 );
@@ -116,7 +116,7 @@ wxmini_api_post!(
     /// [文本内容安全识别](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/sec-center/sec-check/msgSecCheck.html)
     request_msg_sec_check,
     "http://api.weixin.qq.com/wxa/msg_sec_check",
-    (access_token: &str),
+    (access_token: Option<&str>),
     &MsgSecCheckBody,
     MsgSecCheckResponseData
 );

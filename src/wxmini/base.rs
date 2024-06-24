@@ -58,7 +58,7 @@ macro_rules! wxmini_api_get {
 
 pub(crate) async fn post<D, B, F>(
     url: &str,
-    query: &[(&str, &str)],
+    query: &[(&str, Option<&str>)],
     body: &B,
     map: F,
 ) -> Result<D, WxminiApiError>
