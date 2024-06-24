@@ -5,5 +5,6 @@
 //! 对于该 crate 未封装的 Api，你可以使用 [`wxmini_api_post!`](crate::wxmini_api_post) 和 [`wxmini_api_get!`](crate::wxmini_api_get) 自行封装。
 
 pub mod api;
-mod base;
+#[doc(hidden)]
+pub mod base;
 pub use base::WxminiApiError;

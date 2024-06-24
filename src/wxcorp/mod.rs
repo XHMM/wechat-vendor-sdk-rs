@@ -4,5 +4,6 @@
 //!
 
 pub mod api;
-mod base;
+#[doc(hidden)]
+pub mod base;
 pub use base::WxcorpApiError;

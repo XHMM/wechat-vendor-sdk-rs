@@ -14,7 +14,7 @@ pub enum WxminiApiError {
     Request(#[from] reqwest::Error),
 }
 
-pub(crate) async fn get<D, F>(
+pub async fn __private_get<D, F>(
     url: &str,
     query: &[(&str, &str)],
     map: F,
@@ -42,8 +42,8 @@ where
 macro_rules! wxmini_api_get {
     ($(#[$attr:meta])* $name: ident, $url: tt, ($($v:ident: $t:ty),*), $ret_type: ty) => {
         $(#[$attr])*
-        pub async fn $name($($v: $t),*) -> Result<$ret_type, crate::wxmini::base::WxminiApiError> {
-            crate::wxmini::base::get(
+        pub async fn $name($($v: $t),*) -> Result<$ret_type, $crate::wxmini::base::WxminiApiError> {
+            $crate::wxmini::base::__private_get(
                 &format!(
                     $url
                  ),
@@ -56,7 +56,7 @@ macro_rules! wxmini_api_get {
     };
 }
 
-pub(crate) async fn post<D, B, F>(
+pub async fn __private_post<D, B, F>(
     url: &str,
     query: &[(&str, Option<&str>)],
     body: &B,
@@ -90,8 +90,8 @@ where
 macro_rules! wxmini_api_post {
     ($(#[$attr:meta])* $name: ident, $url: tt, ($($v:ident: $t:ty),*), $req_body:ty, $ret_type:ty) => {
         $(#[$attr])*
-        pub async fn $name(body: $req_body, $($v: $t),*) -> Result<$ret_type, crate::wxmini::base::WxminiApiError> {
-            crate::wxmini::base::post(
+        pub async fn $name(body: $req_body, $($v: $t),*) -> Result<$ret_type, $crate::wxmini::base::WxminiApiError> {
+            $crate::wxmini::base::__private_post(
                 &format!(
                     $url
                  ),

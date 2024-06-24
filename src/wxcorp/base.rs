@@ -13,7 +13,7 @@ pub enum WxcorpApiError {
     Request(#[from] reqwest::Error),
 }
 
-pub(crate) async fn get<D, F>(
+pub async fn __private_get<D, F>(
     url: &str,
     query: &[(&str, &str)],
     map: F,
@@ -40,8 +40,8 @@ where
 macro_rules! wxcorp_api_get {
     ($(#[$attr:meta])* $name: ident, $url: tt, ($($v:ident: $t:ty),*), $ret_type: ty) => {
         $(#[$attr])*
-        pub async fn $name($($v: $t),*) -> Result<$ret_type, crate::wxcorp::base::WxcorpApiError> {
-            crate::wxcorp::base::get(
+        pub async fn $name($($v: $t),*) -> Result<$ret_type, $crate::wxcorp::base::WxcorpApiError> {
+            $crate::wxcorp::base::__private_get(
                 &format!(
                     $url
                  ),
