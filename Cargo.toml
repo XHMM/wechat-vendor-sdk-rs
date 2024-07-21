@@ -1,6 +1,6 @@
 [package]
 name = "wechat-vendor-sdk"
-version = "0.1.5"
+version = "0.2.0"
 edition = "2021"
 keywords = ["wechat"]
 license = "MIT"
@@ -23,12 +23,17 @@ all = ["wxcorp", "wxmini"]
 wxcorp = []
 wxmini = []
 
-[dev-dependencies]
-wechat-vendor-sdk = { path = ".", features = ["all"] }
-
 # docs.rs-specific configuration
 [package.metadata.docs.rs]
 # document all features
 all-features = true
 # defines the configuration attribute `docsrs`
 rustdoc-args = ["--cfg", "docsrs"]
+
+[[example]]
+name = "demo"
+path = "examples/demo.rs"
+required-features = ["all"]
+
+[dev-dependencies]
+wechat-vendor-sdk = { path = ".", features = ["all"] }
