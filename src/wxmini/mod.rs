@@ -20,6 +20,7 @@
 //! 该 crate 仅封装了部分 api，对于要用到的未封装的 api，你可以使用 [`wxmini_api_post!`](crate::wxmini_api_post) 和 [`wxmini_api_get!`](crate::wxmini_api_get) 自行封装，其中 url 无需传入 http/https 协议
 
 mod api;
+pub use api::*;
 
 mod client;
 pub use client::WxminiApiError;
