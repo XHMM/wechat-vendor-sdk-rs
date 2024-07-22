@@ -26,7 +26,7 @@ impl WxminiClient {
         Self { is_http: false }
     }
     pub fn without_https() -> Self {
-        Self { is_http: false }
+        Self { is_http: true }
     }
 }
 
