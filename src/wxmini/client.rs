@@ -51,7 +51,7 @@ impl WxminiClient {
             .send()
             .await?;
         let data: Value = response.json().await?;
-        trace!("wxmini api respone: {:?}", data);
+        // trace!("wxmini api respone: {:?}", data);
 
         // 小程序的 api 响应字段并不标准..
         // 比如碰到过  {"request_id": String("xx"), "error_type": String("SafeLinkError"), "error_code": String("85107"), "error_message": String("URL不在白名单内，请前往「微信云托管控制台-服务管理-云调用-微信令牌」配置")}
@@ -89,11 +89,11 @@ impl WxminiClient {
             .await?;
         let text = response.text().await?;
         let data: Value = serde_json::from_str(&text).map_err(|err| {
-            trace!("decode json error: {}, raw text: {}", err, text);
+            // trace!("decode json error: {}, raw text: {}", err, text);
             err
         })?;
 
-        trace!("wxmini api post response: {:?}", data);
+        // trace!("wxmini api post response: {:?}", data);
 
         if data["errcode"] == 0 || data["errcode"].is_null() {
             match map(data) {

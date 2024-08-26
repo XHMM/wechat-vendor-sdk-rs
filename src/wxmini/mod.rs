@@ -1,4 +1,4 @@
-//! 微信小程序相关 api 的封装
+//! 微信小程序/微信公众号相关 api 的封装
 //!
 //! ## 使用场景
 //! ### 在微信云托管环境
@@ -16,8 +16,6 @@
 //! let res_data = client.request_msg_sec_check(&body, Some(access_token)).await;
 //! ```
 //!
-//! ## 其他说明
-//! 该 crate 仅封装了部分 api，对于要用到的未封装的 api，你可以使用 [`wxmini_api_post!`](crate::wxmini_api_post) 和 [`wxmini_api_get!`](crate::wxmini_api_get) 自行封装，其中 url 无需传入 http/https 协议
 
 mod api;
 pub use api::*;

@@ -185,3 +185,56 @@ wxmini_api_post!(
   &BatchdeletefileRequestBody,
   BatchdeletefileResponseData
 );
+
+// #[derive(Debug, Serialize)]
+// pub struct GetUnlimitedQrcodeRequestBody {
+//     pub env: String,
+//     pub file_list: Vec<BatchdownloadfileFileListRequestItem>,
+// }
+
+// #[derive(Debug, Deserialize, Serialize)]
+// pub struct GetUnlimitedQrcodeResponseData {
+//     pub file_list: Vec<BatchdownloadfileFileListResponseItem>,
+// }
+
+// wxmini_api_post!(
+//     /// [获取不限制的小程序码](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/qr-code/getUnlimitedQRCode.html)
+//     request_get_unlimited_qrcode,
+//     "api.weixin.qq.com/wxa/getwxacodeunlimit",
+//     (access_token: Option<&str>),
+//     &GetUnlimitedQrcodeRequestBody,
+//     GetUnlimitedQrcodeResponseData
+// );
+
+#[derive(Debug, Serialize)]
+#[serde(untagged)]
+pub enum ActionScene {
+    Str { scene_str: String },
+    Id { scene_id: u32 },
+}
+#[derive(Debug, Serialize)]
+pub struct ActionInfo {
+    pub scene: ActionScene,
+}
+#[derive(Debug, Serialize)]
+pub struct QrcodeCreateRequestBody {
+    pub expire_seconds: Option<i32>,
+    pub action_name: String,
+    pub action_info: ActionInfo,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct QrcodeCreateResponseData {
+    pub ticket: String,
+    pub expire_seconds: i32,
+    pub url: String,
+}
+
+wxmini_api_post!(
+    /// [生成带参数的二维码](https://developers.weixin.qq.com/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html)
+    request_qrcode_create,
+    "api.weixin.qq.com/cgi-bin/qrcode/create",
+    (access_token: Option<&str>),
+    &QrcodeCreateRequestBody,
+    QrcodeCreateResponseData
+);

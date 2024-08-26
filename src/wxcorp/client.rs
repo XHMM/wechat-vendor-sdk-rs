@@ -34,7 +34,7 @@ impl WxcorpClient {
         let client = reqwest::Client::new();
         let response = client.get(url).query(query).send().await?;
         let data: Value = response.json().await?;
-        trace!("wxcorp api respone: {:?}", data);
+        // trace!("wxcorp api respone: {:?}", data);
 
         if data["errcode"] == 0 {
             match map(data) {

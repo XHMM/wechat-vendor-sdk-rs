@@ -1,6 +1,8 @@
 use wechat_vendor_sdk::{
     wxcorp::WxcorpClient,
-    wxmini::{UploadfileRequestBody, WxminiClient},
+    wxmini::{
+        ActionInfo, ActionScene, QrcodeCreateRequestBody, UploadfileRequestBody, WxminiClient,
+    },
 };
 
 #[tokio::main]
@@ -14,6 +16,19 @@ async fn main() {
                     path: "xx".into(),
                 },
                 Some("xx"),
+            )
+            .await;
+
+        let res = wxmini_client
+            .request_qrcode_create(
+                &QrcodeCreateRequestBody {
+                    expire_seconds: None,
+                    action_name: "QR_LIMIT_SCENE".to_string(),
+                    action_info: ActionInfo {
+                        scene: ActionScene::Id { scene_id: 1 },
+                    },
+                },
+                None,
             )
             .await;
     }
