@@ -125,9 +125,9 @@ wxmini_api_post!(
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SubscribeMessageRequestBody {
     pub template_id: String,
-    pub page: Option<String>,
     pub touser: String,
     pub data: Value,
+    pub page: Option<String>,
     pub miniprogram_state: Option<String>,
     pub lang: Option<String>,
 }
@@ -226,7 +226,7 @@ pub struct QrcodeCreateRequestBody {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct QrcodeCreateResponseData {
     pub ticket: String,
-    pub expire_seconds: i32,
+    pub expire_seconds: Option<i32>,
     pub url: String,
 }
 

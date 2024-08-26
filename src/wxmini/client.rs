@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use serde::Serialize;
 use serde_json::Value;
 use tracing::{error, trace};
@@ -51,11 +53,13 @@ impl WxminiClient {
             .send()
             .await?;
         let data: Value = response.json().await?;
-        // trace!("wxmini api respone: {:?}", data);
+        // trace!("wxmini api get response: {:?}", data);
 
         // 小程序的 api 响应字段并不标准..
         // 比如碰到过  {"request_id": String("xx"), "error_type": String("SafeLinkError"), "error_code": String("85107"), "error_message": String("URL不在白名单内，请前往「微信云托管控制台-服务管理-云调用-微信令牌」配置")}
-        if data["error_code"] != 0 || data["errcode"] != 0 {
+        if data.get("error_code").is_some_and(|v| v != 0)
+            || data.get("errcode").is_some_and(|v| v != 0)
+        {
             return Err(WxminiApiError::ApiCodeNotOk(data));
         }
 
@@ -73,7 +77,7 @@ impl WxminiClient {
         map: F,
     ) -> Result<D, WxminiApiError>
     where
-        B: Serialize,
+        B: Serialize + Debug,
         F: FnOnce(Value) -> Result<D, serde_json::Error>,
     {
         let client = reqwest::Client::new();
@@ -95,13 +99,15 @@ impl WxminiClient {
 
         // trace!("wxmini api post response: {:?}", data);
 
-        if data["errcode"] == 0 || data["errcode"].is_null() {
-            match map(data) {
-                Ok(data) => Ok(data),
-                Err(err) => Err(WxminiApiError::Deserialize(err)),
-            }
-        } else {
-            Err(WxminiApiError::ApiCodeNotOk(data))
+        if data.get("error_code").is_some_and(|v| v != 0)
+            || data.get("errcode").is_some_and(|v| v != 0)
+        {
+            return Err(WxminiApiError::ApiCodeNotOk(data));
+        }
+
+        match map(data) {
+            Ok(data) => Ok(data),
+            Err(err) => Err(WxminiApiError::Deserialize(err)),
         }
     }
 }
