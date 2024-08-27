@@ -238,3 +238,16 @@ wxmini_api_post!(
     &QrcodeCreateRequestBody,
     QrcodeCreateResponseData
 );
+
+#[derive(Debug, Serialize)]
+pub struct MenuCreateRequestBody {
+    pub button: Vec<Value>,
+}
+wxmini_api_post!(
+    /// [自定义菜单-创建接口](https://developers.weixin.qq.com/doc/offiaccount/Custom_Menus/Creating_Custom-Defined_Menu.html)
+    request_menu_create,
+    "api.weixin.qq.com/cgi-bin/menu/create",
+    (access_token: Option<&str>),
+    &MenuCreateRequestBody,
+    Value
+);
