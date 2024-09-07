@@ -17,13 +17,13 @@ pub struct BatchdownloadfileFileListRequestItem {
     pub max_age: u32,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct BatchdownloadfileRequestBody {
     pub env: String,
     pub file_list: Vec<BatchdownloadfileFileListRequestItem>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct BatchdownloadfileFileListResponseItem {
     pub fileid: String,
     pub download_url: String,
@@ -31,7 +31,7 @@ pub struct BatchdownloadfileFileListResponseItem {
     pub errmsg: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct BatchdownloadfileResponseData {
     pub file_list: Vec<BatchdownloadfileFileListResponseItem>,
 }
@@ -45,7 +45,7 @@ wxmini_api_post!(
     BatchdownloadfileResponseData
 );
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MediaSecCheckParams {
     pub media_url: String,
     pub media_type: u8,
@@ -54,7 +54,7 @@ pub struct MediaSecCheckParams {
     pub openid: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MediaSecCheckBody {
     #[serde(flatten)]
     pub params: MediaSecCheckParams,
@@ -75,7 +75,7 @@ wxmini_api_post!(
     MediaSecCheckResponseData
 );
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MsgSecCheckParams {
     pub content: String,
     /// 1 资料；2 评论；3 论坛；4 社交日志
@@ -83,14 +83,14 @@ pub struct MsgSecCheckParams {
     pub openid: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MsgSecCheckBody {
     #[serde(flatten)]
     pub params: MsgSecCheckParams,
     pub version: u8,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MsgSecCheckDetailItem {
     pub strategy: String,
     pub errcode: i32,
@@ -100,13 +100,13 @@ pub struct MsgSecCheckDetailItem {
     pub prob: Option<u8>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MsgSecCheckResult {
     pub suggest: String,
     pub label: u32,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MsgSecCheckResponseData {
     pub detail: Vec<MsgSecCheckDetailItem>,
     pub trace_id: String,
@@ -122,7 +122,7 @@ wxmini_api_post!(
     MsgSecCheckResponseData
 );
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SubscribeMessageRequestBody {
     pub template_id: String,
     pub touser: String,
@@ -132,7 +132,7 @@ pub struct SubscribeMessageRequestBody {
     pub lang: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SubscribeMessageResponseData {}
 
 wxmini_api_post!(
@@ -144,13 +144,13 @@ wxmini_api_post!(
   SubscribeMessageResponseData
 );
 
-#[derive(Serialize, Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct UploadfileRequestBody {
     pub env: String,
     pub path: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct UploadfileResponseData {
     pub url: String,
     pub token: String,
@@ -168,13 +168,13 @@ wxmini_api_post!(
   UploadfileResponseData
 );
 
-#[derive(Serialize, Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct BatchdeletefileRequestBody {
     pub env: String,
     pub fileid_list: Vec<String>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct BatchdeletefileResponseData {}
 
 wxmini_api_post!(
@@ -192,7 +192,7 @@ wxmini_api_post!(
 //     pub file_list: Vec<BatchdownloadfileFileListRequestItem>,
 // }
 
-// #[derive(Debug, Deserialize, Serialize)]
+// #[derive(Debug, Serialize, Deserialize)]
 // pub struct GetUnlimitedQrcodeResponseData {
 //     pub file_list: Vec<BatchdownloadfileFileListResponseItem>,
 // }
@@ -206,24 +206,24 @@ wxmini_api_post!(
 //     GetUnlimitedQrcodeResponseData
 // );
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ActionScene {
     Str { scene_str: String },
     Id { scene_id: u32 },
 }
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ActionInfo {
     pub scene: ActionScene,
 }
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct QrcodeCreateRequestBody {
     pub expire_seconds: Option<i32>,
     pub action_name: String,
     pub action_info: ActionInfo,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct QrcodeCreateResponseData {
     pub ticket: String,
     pub expire_seconds: Option<i32>,
@@ -239,7 +239,7 @@ wxmini_api_post!(
     QrcodeCreateResponseData
 );
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MenuCreateRequestBody {
     pub button: Vec<Value>,
 }
@@ -252,21 +252,21 @@ wxmini_api_post!(
     Value
 );
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TagsCreateRequestItem {
     pub name: String,
 }
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TagsCreateRequestBody {
     pub tag: TagsCreateRequestItem,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TagsCreateResponseItem {
     pub id: i32,
     pub name: String,
 }
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TagsCreateResponseData {
     pub tag: TagsCreateResponseItem,
 }
@@ -279,12 +279,12 @@ wxmini_api_post!(
     TagsCreateResponseData
 );
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TagsGetResponseItem {
     pub id: i32,
     pub name: String,
 }
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TagsGetResponseData {
     pub tags: Vec<TagsCreateResponseItem>,
 }
@@ -296,13 +296,13 @@ wxmini_api_get!(
     TagsGetResponseData
 );
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TagsMembersBatchtaggingRequestBody {
     pub openid_list: Vec<String>,
     pub tagid: i32,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TagsMembersBatchtaggingResponseData {}
 wxmini_api_post!(
     /// [用户标签管理-批量为用户打标签](https://developers.weixin.qq.com/doc/offiaccount/User_Management/User_Tag_Management.html)
@@ -313,11 +313,11 @@ wxmini_api_post!(
     Value
 );
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct UserGetResponseItemData {
     pub openid: Vec<String>,
 }
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct UserGetResponseData {
     pub total: i32,
     pub count: i32,
