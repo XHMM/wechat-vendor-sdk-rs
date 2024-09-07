@@ -7,7 +7,7 @@ wxmini_api_get!(
     /// [获取 access token](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-access-token/getAccessToken.html)
     request_access_token,
     "api.weixin.qq.com/cgi-bin/token",
-    (appid: &str, secret: &str, grant_type: &str),
+    (appid: Option<&str>, secret: Option<&str>, grant_type: Option<&str>),
     AccessTokenData
 );
 
@@ -250,4 +250,84 @@ wxmini_api_post!(
     (access_token: Option<&str>),
     &MenuCreateRequestBody,
     Value
+);
+
+#[derive(Debug, Serialize)]
+pub struct TagsCreateRequestItem {
+    pub name: String,
+}
+#[derive(Debug, Serialize)]
+pub struct TagsCreateRequestBody {
+    pub tag: TagsCreateRequestItem,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TagsCreateResponseItem {
+    pub id: i32,
+    pub name: String,
+}
+#[derive(Debug, Deserialize)]
+pub struct TagsCreateResponseData {
+    pub tag: TagsCreateResponseItem,
+}
+wxmini_api_post!(
+    /// [用户标签管理-创建标签](https://developers.weixin.qq.com/doc/offiaccount/User_Management/User_Tag_Management.html)
+    request_tags_create,
+    "api.weixin.qq.com/cgi-bin/tags/create",
+    (access_token: Option<&str>),
+    &TagsCreateRequestBody,
+    TagsCreateResponseData
+);
+
+#[derive(Debug, Deserialize)]
+pub struct TagsGetResponseItem {
+    pub id: i32,
+    pub name: String,
+}
+#[derive(Debug, Deserialize)]
+pub struct TagsGetResponseData {
+    pub tags: Vec<TagsCreateResponseItem>,
+}
+wxmini_api_get!(
+    /// [用户标签管理-获取公众号已创建的标签](https://developers.weixin.qq.com/doc/offiaccount/User_Management/User_Tag_Management.html)
+    request_tags_get,
+    "api.weixin.qq.com/cgi-bin/tags/get",
+    (access_token: Option<&str>),
+    TagsGetResponseData
+);
+
+#[derive(Debug, Serialize)]
+pub struct TagsMembersBatchtaggingRequestBody {
+    pub openid_list: Vec<String>,
+    pub tagid: i32,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TagsMembersBatchtaggingResponseData {}
+wxmini_api_post!(
+    /// [用户标签管理-批量为用户打标签](https://developers.weixin.qq.com/doc/offiaccount/User_Management/User_Tag_Management.html)
+    request_tags_members_batchtagging,
+    "api.weixin.qq.com/cgi-bin/tags/members/batchtagging",
+    (access_token: Option<&str>),
+    &TagsMembersBatchtaggingRequestBody,
+    Value
+);
+
+#[derive(Debug, Deserialize)]
+pub struct UserGetResponseItemData {
+    pub openid: Vec<String>,
+}
+#[derive(Debug, Deserialize)]
+pub struct UserGetResponseData {
+    pub total: i32,
+    pub count: i32,
+    pub data: UserGetResponseItemData,
+    pub next_openid: String,
+}
+wxmini_api_get!(
+    /// [获取用户列表](https://developers.weixin.qq.com/doc/offiaccount/User_Management/Getting_a_User_List.html)
+    request_user_get,
+    "api.weixin.qq.com/cgi-bin/user/get",
+    (access_token: Option<&str>, next_openid: Option<&str>),
+    UserGetResponseData
 );

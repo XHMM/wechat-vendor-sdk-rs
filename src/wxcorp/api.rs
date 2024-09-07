@@ -10,7 +10,7 @@ wxcorp_api_get!(
     /// [获取 access token](https://developer.work.weixin.qq.com/document/path/91039)
     request_access_token,
     "https://qyapi.weixin.qq.com/cgi-bin/gettoken",
-    (corpid: &str, corpsecret: &str),
+    (corpid: Option<&str>, corpsecret: Option<&str>),
     AccessTokenData
 );
 
@@ -30,7 +30,7 @@ wxcorp_api_get!(
     /// [根据 code 获取用户 id 信息](https://developer.work.weixin.qq.com/document/path/98176)
     request_user_id_by_auth_code,
     "https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo",
-    (access_token: &str, code: &str),
+    (access_token: Option<&str>, code: Option<&str>),
     UserIdInfoByAuthCode
 );
 
@@ -44,6 +44,6 @@ wxcorp_api_get!(
     /// [根据 userid 获取用户详情](https://developer.work.weixin.qq.com/document/path/90196)
     request_user_info_by_user_id,
     "https://qyapi.weixin.qq.com/cgi-bin/user/get",
-    (access_token: &str, userid: &str),
+    (access_token: Option<&str>, userid: Option<&str>),
     UserInfo
 );

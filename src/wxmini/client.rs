@@ -14,9 +14,9 @@ pub enum WxminiApiError {
     /// 微信 api 的响应内容解析失败，一般是响应内容的 struct 定义和响应内容不一致所致
     #[error("deserialize response error: {0}")]
     /// 请求微信 api 网络出错
-    Deserialize(#[from] serde_json::Error),
+    WxminiResDeserializeErr(#[from] serde_json::Error),
     #[error("request error: {0}")]
-    Request(#[from] reqwest::Error),
+    RequestErr(#[from] reqwest::Error),
 }
 
 pub struct WxminiClient {
@@ -36,7 +36,7 @@ impl WxminiClient {
     pub(crate) async fn call_get<D, F>(
         &self,
         endpoint_without_protocol: &str,
-        query: &[(&str, &str)],
+        query: &[(&str, Option<&str>)],
         map: F,
     ) -> Result<D, WxminiApiError>
     where
@@ -65,7 +65,7 @@ impl WxminiClient {
 
         match map(data) {
             Ok(data) => Ok(data),
-            Err(err) => Err(WxminiApiError::Deserialize(err)),
+            Err(err) => Err(WxminiApiError::WxminiResDeserializeErr(err)),
         }
     }
 
@@ -93,7 +93,7 @@ impl WxminiClient {
             .await?;
         let text = response.text().await?;
         let data: Value = serde_json::from_str(&text).map_err(|err| {
-            // trace!("decode json error: {}, raw text: {}", err, text);
+            trace!("decode json error: {}, response raw text: {}", err, text);
             err
         })?;
 
@@ -107,7 +107,7 @@ impl WxminiClient {
 
         match map(data) {
             Ok(data) => Ok(data),
-            Err(err) => Err(WxminiApiError::Deserialize(err)),
+            Err(err) => Err(WxminiApiError::WxminiResDeserializeErr(err)),
         }
     }
 }

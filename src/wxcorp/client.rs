@@ -8,9 +8,9 @@ pub enum WxcorpApiError {
     #[error("bad errorcode: {0}")]
     ApiCodeNotOk(Value),
     #[error("deserialize response error: {0}")]
-    Deserialize(#[from] serde_json::Error),
+    WxcorpResDeserializeErr(#[from] serde_json::Error),
     #[error("request error: {0}")]
-    Request(#[from] reqwest::Error),
+    RequestErr(#[from] reqwest::Error),
 }
 
 pub struct WxcorpClient {}
@@ -25,7 +25,7 @@ impl WxcorpClient {
     pub(crate) async fn call_get<D, F>(
         &self,
         url: &str,
-        query: &[(&str, &str)],
+        query: &[(&str, Option<&str>)],
         map: F,
     ) -> Result<D, WxcorpApiError>
     where
@@ -39,7 +39,7 @@ impl WxcorpClient {
         if data["errcode"] == 0 {
             match map(data) {
                 Ok(data) => Ok(data),
-                Err(err) => Err(WxcorpApiError::Deserialize(err)),
+                Err(err) => Err(WxcorpApiError::WxcorpResDeserializeErr(err)),
             }
         } else {
             Err(WxcorpApiError::ApiCodeNotOk(data))
