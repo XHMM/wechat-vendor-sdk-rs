@@ -1390,7 +1390,7 @@ dependencies = [
 
 [[package]]
 name = "wechat-vendor-sdk"
-version = "0.2.5"
+version = "0.3.0"
 dependencies = [
  "reqwest",
  "serde",
