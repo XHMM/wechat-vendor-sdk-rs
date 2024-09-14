@@ -331,3 +331,28 @@ wxmini_api_get!(
     (access_token: Option<&str>, next_openid: Option<&str>),
     UserGetResponseData
 );
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MessageTemplateSendMiniprogramData {
+    pub appid: String,
+    pub pagepath: Option<String>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MessageTemplateSendRequestBody {
+    pub touser: String,
+    pub template_id: String,
+    pub url: Option<String>,
+    pub miniprogram: Option<MessageTemplateSendMiniprogramData>,
+    pub data: Value,
+    pub client_msg_id: Option<String>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MessageTemplateSendResponseData {}
+wxmini_api_post!(
+    /// [发送模板消息](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html#%E5%8F%91%E9%80%81%E6%A8%A1%E6%9D%BF%E6%B6%88%E6%81%AF)
+    request_message_template_send,
+    "api.weixin.qq.com/cgi-bin/message/template/send",
+    (access_token: Option<&str>),
+    &MessageTemplateSendRequestBody,
+    MessageTemplateSendResponseData
+);

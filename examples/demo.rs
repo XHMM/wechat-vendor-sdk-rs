@@ -2,9 +2,9 @@ use serde_json::json;
 use wechat_vendor_sdk::{
     wxcorp::WxcorpClient,
     wxmini::{
-        ActionInfo, ActionScene, MenuCreateRequestBody, QrcodeCreateRequestBody,
-        TagsCreateRequestBody, TagsCreateRequestItem, TagsMembersBatchtaggingRequestBody,
-        WxminiClient,
+        ActionInfo, ActionScene, MenuCreateRequestBody, MessageTemplateSendMiniprogramData,
+        MessageTemplateSendRequestBody, QrcodeCreateRequestBody, TagsCreateRequestBody,
+        TagsCreateRequestItem, TagsMembersBatchtaggingRequestBody, WxminiClient,
     },
 };
 
@@ -127,6 +127,39 @@ async fn user_list() {
 
     let res = wxmini_client
         .request_user_get(Some(WXMINI_ACCESS_TOKEN), None)
+        .await;
+    println!("res: {:?}", res);
+}
+
+#[tokio::test]
+async fn message_template_send() {
+    let wxmini_client = WxminiClient::new();
+
+    let res = wxmini_client
+        .request_message_template_send(
+            &MessageTemplateSendRequestBody {
+                touser: "oEY-A6JvR_H2rfKe-rIXsMvbI-j0".into(),
+                template_id: "XL6xXLRsgirejTfPX1h73IJ3XVnO9ySmFcZ7xEgXpes".into(),
+                url: Some("https://site.com".into()),
+                miniprogram: Some(MessageTemplateSendMiniprogramData {
+                    appid: "wxxx".into(),
+                    pagepath: Some("pages/goods/index".into()),
+                }),
+                client_msg_id: None,
+                data: json!({
+                    "thing9":{
+                       "value":"用户昵称"
+                    },
+                    "time6":{
+                       "value":"15:01"
+                    },
+                    "thing17":{
+                       "value":"这是内容"
+                    },
+                }),
+            },
+            Some(WXMINI_ACCESS_TOKEN),
+        )
         .await;
     println!("res: {:?}", res);
 }
