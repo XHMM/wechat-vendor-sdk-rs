@@ -4,7 +4,8 @@ use wechat_vendor_sdk::{
     wxmini::{
         ActionInfo, ActionScene, MenuCreateRequestBody, MessageTemplateSendMiniprogramData,
         MessageTemplateSendRequestBody, QrcodeCreateRequestBody, TagsCreateRequestBody,
-        TagsCreateRequestItem, TagsMembersBatchtaggingRequestBody, WxminiClient,
+        TagsCreateRequestItem, TagsMembersBatchtaggingRequestBody, UserInfoBatchgetItem,
+        WxminiClient,
     },
 };
 
@@ -157,6 +158,24 @@ async fn message_template_send() {
                        "value":"这是内容"
                     },
                 }),
+            },
+            Some(WXMINI_ACCESS_TOKEN),
+        )
+        .await;
+    println!("res: {:?}", res);
+}
+
+#[tokio::test]
+async fn user_info() {
+    let wxmini_client = WxminiClient::new();
+
+    let res = wxmini_client
+        .request_user_info_batchget(
+            &wechat_vendor_sdk::wxmini::UserInfoBatchgetRequestBody {
+                user_list: vec![UserInfoBatchgetItem {
+                    openid: "oEY-A6JvR_H2rfKe-rIXsMvbI-j0".into(),
+                    lang: None,
+                }],
             },
             Some(WXMINI_ACCESS_TOKEN),
         )

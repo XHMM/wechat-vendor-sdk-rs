@@ -356,3 +356,41 @@ wxmini_api_post!(
     &MessageTemplateSendRequestBody,
     MessageTemplateSendResponseData
 );
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserInfoBatchgetItem {
+    pub openid: String,
+    pub lang: Option<String>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserInfoBatchgetRequestBody {
+    pub user_list: Vec<UserInfoBatchgetItem>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserInfo {
+    /// subscribe 为 0 时表示未关注，不会有下述字段
+    pub subscribe: i32,
+    pub openid: Option<String>,
+    pub language: Option<String>,
+    pub subscribe_time: Option<i64>,
+    pub unionid: Option<String>,
+    pub remark: Option<String>,
+    pub groupid: Option<i32>,
+    pub tagid_list: Vec<i32>,
+    pub subscribe_scene: Option<String>,
+    pub qr_scene: Option<i32>,
+    pub qr_scene_str: Option<String>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserInfoBatchgetResponseData {
+    pub user_info_list: Vec<UserInfo>,
+}
+wxmini_api_post!(
+    /// [批量获取用户基本信息](https://developers.weixin.qq.com/doc/offiaccount/User_Management/Get_users_basic_information_UnionID.html#UinonId)
+    request_user_info_batchget,
+    "api.weixin.qq.com/cgi-bin/user/info/batchget",
+    (access_token: Option<&str>),
+    &UserInfoBatchgetRequestBody,
+    UserInfoBatchgetResponseData
+);
