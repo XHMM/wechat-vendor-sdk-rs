@@ -1,3 +1,5 @@
+//! You can use `RUST_LOG=wechat_vendor_sdk=trace cargo run` to get response tracing log when getting such as `WxcorpResDeserializeErr` error
+//!
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 pub mod common;

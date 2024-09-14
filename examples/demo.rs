@@ -127,7 +127,10 @@ async fn user_list() {
     let wxmini_client = WxminiClient::new();
 
     let res = wxmini_client
-        .request_user_get(Some(WXMINI_ACCESS_TOKEN), None)
+        .request_user_get(
+            Some(WXMINI_ACCESS_TOKEN),
+            Some("oEY-A6JiOWCW0KecJy-ZAUOOrxbs"),
+        )
         .await;
     println!("res: {:?}", res);
 }

@@ -321,7 +321,7 @@ pub struct UserGetResponseItemData {
 pub struct UserGetResponseData {
     pub total: i32,
     pub count: i32,
-    pub data: UserGetResponseItemData,
+    pub data: Option<UserGetResponseItemData>,
     pub next_openid: String,
 }
 wxmini_api_get!(
