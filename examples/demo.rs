@@ -185,3 +185,13 @@ async fn user_info() {
         .await;
     println!("res: {:?}", res);
 }
+
+#[tokio::test]
+async fn jsticket() {
+    let wxmini_client = WxminiClient::new();
+
+    let res = wxmini_client
+        .request_getticket(Some(WXMINI_ACCESS_TOKEN))
+        .await;
+    println!("res: {:?}", res);
+}

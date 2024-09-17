@@ -333,6 +333,19 @@ wxmini_api_get!(
 );
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct GetTicketResponseData {
+    pub ticket: String,
+    pub expires_in: i32,
+}
+wxmini_api_get!(
+    /// [jssdk签名](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#62)
+    request_getticket,
+    "api.weixin.qq.com/cgi-bin/ticket/getticket?type=jsapi",
+    (access_token: Option<&str>),
+    GetTicketResponseData
+);
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MessageTemplateSendMiniprogramData {
     pub appid: String,
     pub pagepath: Option<String>,
