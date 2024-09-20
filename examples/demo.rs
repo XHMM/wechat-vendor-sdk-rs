@@ -3,9 +3,9 @@ use wechat_vendor_sdk::{
     wxcorp::WxcorpClient,
     wxmini::{
         ActionInfo, ActionScene, MenuCreateRequestBody, MessageTemplateSendMiniprogramData,
-        MessageTemplateSendRequestBody, QrcodeCreateRequestBody, TagsCreateRequestBody,
-        TagsCreateRequestItem, TagsMembersBatchtaggingRequestBody, UserInfoBatchgetItem,
-        WxminiClient,
+        MessageTemplateSendRequestBody, QrcodeCreateRequestBody, StableAccessTokenRequestBody,
+        TagsCreateRequestBody, TagsCreateRequestItem, TagsMembersBatchtaggingRequestBody,
+        UserInfoBatchgetItem, WxminiClient,
     },
 };
 
@@ -35,6 +35,21 @@ async fn at() {
         .await
         .unwrap();
     println!("at: {:?}", at);
+}
+
+#[tokio::test]
+async fn stable_at() {
+    let wxmini_client = WxminiClient::new();
+    let at = wxmini_client
+        .request_stable_access_token(&StableAccessTokenRequestBody {
+            grant_type: "client_credential".into(),
+            appid: "xx".into(),
+            secret: "yy".into(),
+            force_refresh: Some(false),
+        })
+        .await
+        .unwrap();
+    println!("stable at: {:?}", at);
 }
 
 const WXMINI_ACCESS_TOKEN: &str = "TOKEN_FOR_TEST";

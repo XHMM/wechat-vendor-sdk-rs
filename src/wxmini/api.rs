@@ -12,6 +12,25 @@ wxmini_api_get!(
 );
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct StableAccessTokenRequestBody {
+    pub grant_type: String,
+    pub appid: String,
+    pub secret: String,
+    pub force_refresh: Option<bool>,
+}
+
+wxmini_api_post!(
+    /// [获取稳定版接口调用凭据](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-access-token/getStableAccessToken.html)
+    request_stable_access_token,
+    "api.weixin.qq.com/cgi-bin/stable_token
+
+",
+    (),
+    &StableAccessTokenRequestBody,
+    AccessTokenData
+);
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct BatchdownloadfileFileListRequestItem {
     pub fileid: String,
     pub max_age: u32,
