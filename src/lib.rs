@@ -10,3 +10,7 @@ pub mod wxcorp;
 #[cfg(feature = "wxmini")]
 #[cfg_attr(docsrs, doc(cfg(feature = "wxmini")))]
 pub mod wxmini;
+
+#[cfg(feature = "wxpay")]
+#[cfg_attr(docsrs, doc(cfg(feature = "wxpay")))]
+pub mod wxpay;

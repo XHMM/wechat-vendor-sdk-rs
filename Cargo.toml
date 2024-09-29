@@ -1,10 +1,10 @@
 [package]
 name = "wechat-vendor-sdk"
-version = "0.3.6"
+version = "0.3.7"
 edition = "2021"
 keywords = ["wechat"]
 license = "MIT"
-description = "wechat miniprogram and wechat corp sdk (微信小程序和企业微信部分 sdk 封装)"
+description = "wechat miniprogram and wechat corp sdk (微信小程序、公众号和企业微信部分 sdk 封装)"
 repository = "https://github.com/XHMM/wechat-vendor-sdk-rs"
 documentation = "https://docs.rs/wechat-vendor-sdk/"
 
@@ -16,12 +16,17 @@ serde = { version = "1.0.193", features = ["derive"] }
 serde_json = "1.0.108"
 tracing = "0.1.40"
 reqwest = { version = "0.12.3", features = ["json"] }
+rand = { version = "0.8.5", optional = true }
+rsa = { version = "0.9.6", optional = true, features = ["sha2"] }
+base64 = { version = "0.22.1", optional = true }
+chrono = { version = "0.4.22", optional = true }
 
 [features]
 default = []
-all = ["wxcorp", "wxmini"]
+all = ["wxcorp", "wxmini", "wxpay"]
 wxcorp = []
 wxmini = []
+wxpay = ["dep:rand", "dep:rsa", "dep:base64", "dep:chrono"]
 
 # docs.rs-specific configuration
 [package.metadata.docs.rs]
