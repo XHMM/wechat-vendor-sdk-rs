@@ -9,6 +9,29 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum WxpayApiError {
+    #[error("timestamp is invalid")]
+    InvalidTimestamp,
+
+    #[error("invalid ciphertext: {0}")]
+    InvalidCiphertext(#[from] aes_gcm::aes::cipher::InvalidLength),
+
+    #[error("invalid public key")]
+    InvalidPublicKey,
+
+    #[error("invalid private key")]
+    InvalidPrivateKey,
+
+    #[error("request error: {0}")]
+    RequestErr(#[from] reqwest::Error),
+
+    #[error("base64 decode error: {0}")]
+    Base64DecodeError(#[from] base64::DecodeError),
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct BatchTransferRequest {
     pub appid: String,
@@ -76,11 +99,11 @@ pub async fn request_batch_transfer<'a>(
         wxpay_serial_no,
         request,
     }: RequestBatchTransfer<'a>,
-) -> Result<WxpayResponse<serde_json::Value>, Box<dyn std::error::Error>> {
+) -> Result<WxpayResponse<serde_json::Value>, WxpayApiError> {
     let url = "https://api.mch.weixin.qq.com/v3/transfer/batches";
     let method = "POST";
 
-    let body = serde_json::to_string(&request)?;
+    let body = serde_json::to_string(&request).expect("failed to serialize request");
 
     let (signature, timestamp, nonce_str) =
         generate_wxpay_signature(method, "/v3/transfer/batches", mch_private_key, Some(&body))?;
@@ -107,7 +130,7 @@ pub fn generate_wxpay_signature(
     url_path: &str,
     private_key: &str,
     body: Option<&str>,
-) -> Result<(String, String, String), Box<dyn std::error::Error>> {
+) -> Result<(String, String, String), WxpayApiError> {
     let timestamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap()
@@ -121,9 +144,8 @@ pub fn generate_wxpay_signature(
         content_to_sign.push_str(body_content);
         content_to_sign.push('\n');
     }
-    println!("{content_to_sign}");
 
-    let signature = sha256_ras_and_base64(private_key, &content_to_sign);
+    let signature = sha256_ras_and_base64(private_key, &content_to_sign)?;
 
     Ok((signature, timestamp, nonce_str))
 }
@@ -140,7 +162,10 @@ pub fn generate_noncestr(length: usize) -> String {
     noncestr
 }
 
-pub fn sha256_ras_and_base64(private_key: &str, content_to_be_signed: &str) -> String {
+pub fn sha256_ras_and_base64(
+    private_key: &str,
+    content_to_be_signed: &str,
+) -> Result<String, WxpayApiError> {
     use rsa::sha2::{Digest, Sha256};
     use rsa::RsaPrivateKey;
 
@@ -149,13 +174,14 @@ pub fn sha256_ras_and_base64(private_key: &str, content_to_be_signed: &str) -> S
     let hash = hasher.finalize();
 
     // 这里使用 from_pkcs8_pem 还是 from_pkcs1_pem 可以看你密钥文件的文件开头格式
-    let private_key = RsaPrivateKey::from_pkcs8_pem(private_key).expect("failed to parse ");
+    let private_key =
+        RsaPrivateKey::from_pkcs8_pem(private_key).map_err(|e| WxpayApiError::InvalidPrivateKey)?;
     // Pkcs1v15Sign 是使用 PKCS#1 v1.5 规范进行签名，还有个 SigningKey 是用于生产签名所用的秘钥的，并不是用来签名的，所以这里不能用错..
     let padding = Pkcs1v15Sign::new::<rsa::sha2::Sha256>();
     let signature = private_key.sign(padding, &hash).expect("failed to sign");
 
     let sig = general_purpose::STANDARD.encode(&signature);
-    sig
+    Ok(sig)
 }
 
 /// 用于验证微信支付的回调请求签名
@@ -174,7 +200,7 @@ pub fn verify_wxpay_callback_signature(
     body: &str,
     // 是否跳过时间戳检查
     skip_timestamp_check: Option<bool>,
-) -> Result<bool, Box<dyn std::error::Error>> {
+) -> Result<bool, WxpayApiError> {
     use base64::{engine::general_purpose, Engine as _};
     use rsa::sha2::{Digest, Sha256};
     use rsa::RsaPublicKey;
@@ -185,11 +211,11 @@ pub fn verify_wxpay_callback_signature(
         let current_time = Utc::now();
         let timestamp_secs = timestamp
             .parse::<i64>()
-            .map_err(|e| format!("invalid timestamp: {}", e))?;
+            .map_err(|_| WxpayApiError::InvalidTimestamp)?;
         let timestamp_datetime = Utc
             .timestamp_opt(timestamp_secs, 0)
             .single()
-            .ok_or("timestamp is invalid")?;
+            .ok_or(WxpayApiError::InvalidTimestamp)?;
 
         let time_diff = current_time - timestamp_datetime;
         if time_diff > Duration::seconds(300) {
@@ -206,7 +232,8 @@ pub fn verify_wxpay_callback_signature(
     hasher.update(message.as_bytes());
     let hash = hasher.finalize();
 
-    let public_key = RsaPublicKey::from_public_key_pem(wx_public_key)?;
+    let public_key = RsaPublicKey::from_public_key_pem(wx_public_key)
+        .map_err(|e| WxpayApiError::InvalidPublicKey)?;
     let scheme = Pkcs1v15Sign::new::<Sha256>();
     let res = public_key.verify(scheme, &hash, signature_bytes.as_slice());
     match res {
@@ -260,7 +287,7 @@ pub fn decrypt_wxpay_callback_resource(
     ciphertext: &str,
     nonce: &str,
     associated_data: &str,
-) -> Result<WxpayCallbackResourceData, Box<dyn std::error::Error>> {
+) -> Result<Option<WxpayCallbackResourceData>, WxpayApiError> {
     use aes_gcm::aead::{Aead, Payload};
     use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
     use base64::{engine::general_purpose, Engine as _};
@@ -274,11 +301,23 @@ pub fn decrypt_wxpay_callback_resource(
     };
     let nonce = Nonce::from_slice(nonce.as_bytes());
 
-    let plaintext = cipher
-        .decrypt(nonce, payload)
-        .map_err(|e| format!("decrypt error: {:?}", e))?;
-
-    serde_json::from_slice(&plaintext).map_err(|e| format!("decode json error: {:?}", e).into())
+    let plaintext = cipher.decrypt(nonce, payload);
+    match plaintext {
+        Ok(plaintext) => {
+            let val = serde_json::from_slice(&plaintext);
+            match val {
+                Ok(val) => Ok(Some(val)),
+                Err(e) => {
+                    tracing::error!("decrypt wxpay callback resource to json failed: {}", e);
+                    Ok(None)
+                }
+            }
+        }
+        Err(e) => {
+            tracing::error!("decrypt wxpay callback resource failed: {}", e);
+            Ok(None)
+        }
+    }
 }
 
 #[test]
