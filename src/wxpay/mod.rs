@@ -25,6 +25,9 @@ pub enum WxpayApiError {
     #[error("invalid private key")]
     InvalidPrivateKey,
 
+    #[error("decrypt failed")]
+    DecryptFailed,
+
     #[error("request error: {0}")]
     RequestErr(#[from] reqwest::Error),
 
@@ -287,7 +290,7 @@ pub fn decrypt_wxpay_callback_resource(
     ciphertext: &str,
     nonce: &str,
     associated_data: &str,
-) -> Result<Option<WxpayCallbackResourceData>, WxpayApiError> {
+) -> Result<WxpayCallbackResourceData, WxpayApiError> {
     use aes_gcm::aead::{Aead, Payload};
     use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
     use base64::{engine::general_purpose, Engine as _};
@@ -301,21 +304,15 @@ pub fn decrypt_wxpay_callback_resource(
     };
     let nonce = Nonce::from_slice(nonce.as_bytes());
 
-    let plaintext = cipher.decrypt(nonce, payload);
-    match plaintext {
-        Ok(plaintext) => {
-            let val = serde_json::from_slice(&plaintext);
-            match val {
-                Ok(val) => Ok(Some(val)),
-                Err(e) => {
-                    tracing::error!("decrypt wxpay callback resource to json failed: {}", e);
-                    Ok(None)
-                }
-            }
-        }
+    let plaintext = cipher
+        .decrypt(nonce, payload)
+        .map_err(|_| WxpayApiError::DecryptFailed)?;
+    let val = serde_json::from_slice(&plaintext);
+    match val {
+        Ok(val) => Ok(val),
         Err(e) => {
-            tracing::error!("decrypt wxpay callback resource failed: {}", e);
-            Ok(None)
+            tracing::error!("decrypt wxpay callback resource to json failed: {}", e);
+            Err(WxpayApiError::DecryptFailed)
         }
     }
 }
