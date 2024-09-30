@@ -221,6 +221,68 @@ pub fn verify_wxpay_callback_signature(
     // }
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+
+pub struct WxpayCallbackResourceClosed {
+    pub mchid: String,
+    pub out_batch_no: String,
+    pub batch_id: String,
+    pub batch_status: String,
+    pub close_reason: Option<String>,
+    pub total_amount: i64,
+    pub total_num: i64,
+    pub close_time: String,
+    pub create_time: String,
+    pub update_time: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+
+pub struct WxpayCallbackResourceFinished {
+    pub out_batch_no: String,
+    pub batch_id: String,
+    pub batch_status: String,
+    pub total_amount: i64,
+    pub total_num: i64,
+    pub success_amount: i64,
+    pub success_num: i64,
+    pub fail_amount: i64,
+    pub fail_num: i64,
+    pub update_time: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum WxpayCallbackResource {
+    Closed(WxpayCallbackResourceClosed),
+    Finished(WxpayCallbackResourceFinished),
+}
+pub fn decrypt_wxpay_callback_resource(
+    apiv3_key: &str,
+    ciphertext: &str,
+    nonce: &str,
+    associated_data: &str,
+) -> Result<WxpayCallbackResource, Box<dyn std::error::Error>> {
+    use aes_gcm::aead::{Aead, Payload};
+    use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
+    use base64::{engine::general_purpose, Engine as _};
+
+    let ciphertext = general_purpose::STANDARD.decode(ciphertext)?;
+
+    let cipher = Aes256Gcm::new_from_slice(apiv3_key.as_bytes())?;
+    let payload = Payload {
+        msg: &ciphertext.as_slice(),
+        aad: &associated_data.as_bytes(),
+    };
+    let nonce = Nonce::from_slice(nonce.as_bytes());
+
+    let plaintext = cipher
+        .decrypt(nonce, payload)
+        .map_err(|e| format!("decrypt error: {:?}", e))?;
+
+    serde_json::from_slice(&plaintext).map_err(|e| format!("decode json error: {:?}", e).into())
+}
+
 #[test]
 fn test_generate_wxpay_signature() {
     let private_key = "-----BEGIN PRIVATE KEY-----
@@ -277,4 +339,14 @@ fn test_timestamp_diff() {
     } else {
         println!("duration22: {:?}", time_diff);
     }
+}
+
+#[test]
+fn test_decrypt_wxpay_callback_resource() {
+    let apiv3_key = "xxx";
+    let nonce = "yyy";
+    let ciphertext = "22qIR8j4SVcexi0PTqgsPPxXICxk+zz==";
+
+    let result = decrypt_wxpay_callback_resource(apiv3_key, ciphertext, nonce, "mch_payment");
+    println!("result: {:?}", result);
 }
