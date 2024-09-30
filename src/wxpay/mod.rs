@@ -223,46 +223,44 @@ pub fn verify_wxpay_callback_signature(
 
 #[derive(Debug, Deserialize, Serialize)]
 
-pub struct WxpayCallbackResourceClosed {
+pub struct WxpayCallbackResourceDataClosed {
     pub mchid: String,
     pub out_batch_no: String,
     pub batch_id: String,
     pub batch_status: String,
+    pub total_num: i32,
+    pub total_amount: i32,
     pub close_reason: Option<String>,
-    pub total_amount: i64,
-    pub total_num: i64,
-    pub close_time: String,
-    pub create_time: String,
     pub update_time: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 
-pub struct WxpayCallbackResourceFinished {
+pub struct WxpayCallbackResourceDataFinished {
     pub out_batch_no: String,
     pub batch_id: String,
     pub batch_status: String,
-    pub total_amount: i64,
-    pub total_num: i64,
-    pub success_amount: i64,
-    pub success_num: i64,
-    pub fail_amount: i64,
-    pub fail_num: i64,
+    pub total_amount: i32,
+    pub total_num: i32,
+    pub success_amount: i32,
+    pub success_num: i32,
+    pub fail_amount: i32,
+    pub fail_num: i32,
     pub update_time: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged)]
-pub enum WxpayCallbackResource {
-    Closed(WxpayCallbackResourceClosed),
-    Finished(WxpayCallbackResourceFinished),
+pub enum WxpayCallbackResourceData {
+    Closed(WxpayCallbackResourceDataClosed),
+    Finished(WxpayCallbackResourceDataFinished),
 }
 pub fn decrypt_wxpay_callback_resource(
     apiv3_key: &str,
     ciphertext: &str,
     nonce: &str,
     associated_data: &str,
-) -> Result<WxpayCallbackResource, Box<dyn std::error::Error>> {
+) -> Result<WxpayCallbackResourceData, Box<dyn std::error::Error>> {
     use aes_gcm::aead::{Aead, Payload};
     use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
     use base64::{engine::general_purpose, Engine as _};
