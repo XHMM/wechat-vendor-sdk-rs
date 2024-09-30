@@ -1,6 +1,6 @@
 [package]
 name = "wechat-vendor-sdk"
-version = "0.3.11-alpha.0"
+version = "0.3.11"
 edition = "2021"
 keywords = ["wechat"]
 license = "MIT"
