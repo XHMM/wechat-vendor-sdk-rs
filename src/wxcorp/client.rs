@@ -35,6 +35,7 @@ impl WxcorpClient {
         let response = client.get(url).query(query).send().await?;
         let data: Value = response.json().await?;
         trace!("wxcorp api response: {:?}", data);
+        // println!("wxcorp api response: {:?}", data);
 
         if data["errcode"] == 0 {
             match map(data) {

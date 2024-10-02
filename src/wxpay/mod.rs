@@ -223,7 +223,6 @@ pub fn verify_wxpay_callback_signature(
         let time_diff = current_time - timestamp_datetime;
         if time_diff > Duration::seconds(300) {
             tracing::error!("timestamp is expired");
-            println!("timestamp is expired");
             return Ok(false);
         }
     }

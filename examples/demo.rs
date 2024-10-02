@@ -1,6 +1,5 @@
 use serde_json::json;
 use wechat_vendor_sdk::{
-    wxcorp::WxcorpClient,
     wxmini::{
         ActionInfo, ActionScene, MenuCreateRequestBody, MessageTemplateSendMiniprogramData,
         MessageTemplateSendRequestBody, QrcodeCreateRequestBody, StableAccessTokenRequestBody,
@@ -18,14 +17,6 @@ async fn main() {
 #[tokio::test]
 async fn without_https() {
     let wxmini_client_http = WxminiClient::without_https();
-}
-
-#[tokio::test]
-async fn wxcorp() {
-    let wxcorp_client = WxcorpClient::new();
-    let res = wxcorp_client
-        .request_user_id_by_auth_code(Some("token"), Some("code"))
-        .await;
 }
 
 #[tokio::test]

@@ -39,6 +39,9 @@ pub struct UserInfo {
     pub userid: String,
     pub name: Option<String>,
     pub avatar: Option<String>,
+    /// 需要设置应用的可见范围
+    pub department: Vec<i32>,
+    pub order: Vec<i32>,
 }
 wxcorp_api_get!(
     /// [根据 userid 获取用户详情](https://developer.work.weixin.qq.com/document/path/90196)
