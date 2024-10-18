@@ -18,7 +18,7 @@ async fn get_id_by_auth_code() {
 async fn get_user_info() {
     let wxcorp_client = WxcorpClient::new();
     let res = wxcorp_client
-        .request_user_info_by_user_id(Some("xxx"), Some("xx"))
+        .request_user_info_by_user_id(Some("token "), Some("nickname"))
         .await;
 
     println!("res: {:?}", res);

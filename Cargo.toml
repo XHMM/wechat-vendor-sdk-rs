@@ -1,6 +1,6 @@
 [package]
 name = "wechat-vendor-sdk"
-version = "0.3.12"
+version = "0.3.13"
 edition = "2021"
 keywords = ["wechat"]
 license = "MIT"
@@ -37,9 +37,20 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [[example]]
-name = "demo"
-path = "examples/demo.rs"
-required-features = ["all"]
+name = "wxmini"
+path = "examples/wxmini.rs"
+required-features = ["wxmini"]
+
+[[example]]
+name = "wxcorp"
+path = "examples/wxcorp.rs"
+required-features = ["wxcorp"]
+
+[[example]]
+name = "wxpay"
+path = "examples/wxpay.rs"
+required-features = ["wxpay"]
+
 
 [dev-dependencies]
 wechat-vendor-sdk = { path = ".", features = ["all"] }

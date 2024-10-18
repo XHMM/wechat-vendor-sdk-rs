@@ -205,25 +205,31 @@ wxmini_api_post!(
   BatchdeletefileResponseData
 );
 
-// #[derive(Debug, Serialize)]
-// pub struct GetUnlimitedQrcodeRequestBody {
-//     pub env: String,
-//     pub file_list: Vec<BatchdownloadfileFileListRequestItem>,
-// }
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GetwxacodeUnlimitRequestBody {
+    pub scene: String,
+    pub page: Option<String>,
+    pub check_path: Option<bool>,
+    pub env_version: Option<String>,
+    pub width: Option<u32>,
+    pub auto_color: Option<bool>,
+    pub line_color: Option<Value>,
+    pub is_hyaline: Option<bool>,
+}
 
-// #[derive(Debug, Serialize, Deserialize)]
-// pub struct GetUnlimitedQrcodeResponseData {
-//     pub file_list: Vec<BatchdownloadfileFileListResponseItem>,
-// }
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GetwxacodeUnlimitesponseData {
+    pub buffer: Vec<u8>,
+}
 
-// wxmini_api_post!(
-//     /// [获取不限制的小程序码](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/qr-code/getUnlimitedQRCode.html)
-//     request_get_unlimited_qrcode,
-//     "api.weixin.qq.com/wxa/getwxacodeunlimit",
-//     (access_token: Option<&str>),
-//     &GetUnlimitedQrcodeRequestBody,
-//     GetUnlimitedQrcodeResponseData
-// );
+wxmini_api_post!(
+    /// [获取不限制的小程序码](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/qr-code/getUnlimitedQRCode.html)
+    request_getwxacodeunlimit,
+    "api.weixin.qq.com/wxa/getwxacodeunlimit",
+    (access_token: Option<&str>),
+    &GetwxacodeUnlimitRequestBody,
+    GetwxacodeUnlimitesponseData
+);
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]

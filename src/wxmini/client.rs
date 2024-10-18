@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use serde::Serialize;
-use serde_json::Value;
+use serde_json::{json, Value};
 use tracing::{error, trace};
 
 use thiserror::Error;
@@ -11,10 +11,16 @@ pub enum WxminiApiError {
     /// 微信 api 返回的错误码不为成功
     #[error("bad errorcode: {0}")]
     ApiCodeNotOk(Value),
+
     /// 微信 api 的响应内容解析失败，一般是响应内容的 struct 定义和响应内容不一致所致
     #[error("deserialize response error: {0}")]
-    /// 请求微信 api 网络出错
     WxminiResDeserializeErr(#[from] serde_json::Error),
+
+    /// buffer 返回值需要使用固定的格式
+    #[error("response is buffer but type mismatch")]
+    WxminiResBufferErr,
+
+    /// 请求微信 api 网络出错
     #[error("request error: {0}")]
     RequestErr(#[from] reqwest::Error),
 }
@@ -91,18 +97,38 @@ impl WxminiClient {
             .json(body)
             .send()
             .await?;
-        let data: Value = response.json().await?;
-        trace!("wxmini api post response: {:?}", data);
+        let content_type = response
+            .headers()
+            .get("content-type")
+            .expect("response header should contain content-type ")
+            .to_str()
+            .unwrap()
+            .to_lowercase();
+        if content_type.contains("application/json") {
+            let data: Value = response.json().await?;
+            trace!("wxmini api post response: {:?}", data);
 
-        if data.get("error_code").is_some_and(|v| v != 0)
-            || data.get("errcode").is_some_and(|v| v != 0)
-        {
-            return Err(WxminiApiError::ApiCodeNotOk(data));
-        }
+            if data.get("error_code").is_some_and(|v| v != 0)
+                || data.get("errcode").is_some_and(|v| v != 0)
+            {
+                return Err(WxminiApiError::ApiCodeNotOk(data));
+            }
 
-        match map(data) {
-            Ok(data) => Ok(data),
-            Err(err) => Err(WxminiApiError::WxminiResDeserializeErr(err)),
+            match map(data) {
+                Ok(data) => Ok(data),
+                Err(err) => Err(WxminiApiError::WxminiResDeserializeErr(err)),
+            }
+        } else {
+            let buffer = response.bytes().await?.to_vec();
+            let value = json!(
+                {
+                    "buffer": buffer
+                }
+            );
+            match map(value) {
+                Ok(data) => Ok(data),
+                Err(_) => Err(WxminiApiError::WxminiResBufferErr),
+            }
         }
     }
 }
