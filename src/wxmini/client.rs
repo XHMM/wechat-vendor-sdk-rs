@@ -107,7 +107,7 @@ impl WxminiClient {
 
         trace!("response headers: {:?}", response.headers());
 
-        if content_type.contains("application/json") {
+        if content_type.contains("application/json") || content_type.contains("text/plain") {
             let data: Value = response.json().await?;
             trace!("wxmini api post response: {:?}", data);
 
