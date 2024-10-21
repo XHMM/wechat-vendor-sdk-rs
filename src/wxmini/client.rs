@@ -99,11 +99,14 @@ impl WxminiClient {
             .await?;
         let content_type = response
             .headers()
-            .get("content-type")
+            .get(reqwest::header::CONTENT_TYPE)
             .expect("response header should contain content-type ")
             .to_str()
             .unwrap()
             .to_lowercase();
+
+        trace!("response headers: {:?}", response.headers());
+
         if content_type.contains("application/json") {
             let data: Value = response.json().await?;
             trace!("wxmini api post response: {:?}", data);

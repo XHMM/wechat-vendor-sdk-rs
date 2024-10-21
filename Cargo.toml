@@ -1,6 +1,6 @@
 [package]
 name = "wechat-vendor-sdk"
-version = "0.3.13"
+version = "0.3.14"
 edition = "2021"
 keywords = ["wechat"]
 license = "MIT"
@@ -53,5 +53,6 @@ required-features = ["wxpay"]
 
 
 [dev-dependencies]
+tracing-subscriber = { version = "0.3.18" }
 wechat-vendor-sdk = { path = ".", features = ["all"] }
 tokio = { version = "1.35.1", features = ["full"] }

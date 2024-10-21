@@ -202,14 +202,18 @@ async fn jsticket() {
 
 #[tokio::test]
 async fn request_getwxacodeunlimit() {
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::TRACE)
+        .init();
+
     let wxmini_client = WxminiClient::new();
     let res = wxmini_client
         .request_getwxacodeunlimit(
             &GetwxacodeUnlimitRequestBody {
-                scene: "a=1".into(),
-                page: Some("pages/goods/index".into()),
-                check_path: Some(false),
-                env_version: Some("release".into()),
+                scene: "gid=xx&_scene=tses".into(),
+                page: Some("pages/post/index".into()),
+                check_path: None,
+                env_version: None,
                 width: None,
                 auto_color: None,
                 line_color: None,
