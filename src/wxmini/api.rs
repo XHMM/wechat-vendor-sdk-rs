@@ -432,3 +432,50 @@ wxmini_api_post!(
     &UserInfoBatchgetRequestBody,
     UserInfoBatchgetResponseData
 );
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GenerateSchemeJumpWxa {
+    pub path: Option<String>,
+    pub query: Option<String>,
+    pub env_version: Option<String>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GenerateSchemeRequestBody {
+    pub jump_wxa: Option<GenerateSchemeJumpWxa>,
+    pub expire_time: Option<i32>,
+    pub expire_type: Option<i32>,
+    pub expire_interval: Option<i32>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GenerateSchemeResponseData {
+    pub openlink: String,
+}
+
+wxmini_api_post!(
+    /// [获取加密scheme码](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/url-scheme/generateScheme.html)
+    request_generatescheme,
+    "api.weixin.qq.com/wxa/generatescheme",
+    (access_token: Option<&str>),
+    &GenerateSchemeRequestBody,
+    GenerateSchemeResponseData
+);
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GenerateShortLinkRequestBody {
+    pub page_url: String,
+    pub page_title: Option<String>,
+    pub is_permanent: Option<bool>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GenerateShortLinkResponseData {
+    pub link: String,
+}
+
+wxmini_api_post!(
+    /// [获取ShortLink](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/short-link/generateShortLink.html)
+    request_genwxashortlink,
+    "api.weixin.qq.com/wxa/genwxashortlink",
+    (access_token: Option<&str>),
+    &GenerateShortLinkRequestBody,
+    GenerateShortLinkResponseData
+);

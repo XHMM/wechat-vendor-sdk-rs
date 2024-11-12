@@ -1,6 +1,7 @@
 use serde_json::json;
 use wechat_vendor_sdk::wxmini::{
-    ActionInfo, ActionScene, GetwxacodeUnlimitRequestBody, MenuCreateRequestBody,
+    ActionInfo, ActionScene, GenerateSchemeJumpWxa, GenerateSchemeRequestBody,
+    GenerateShortLinkRequestBody, GetwxacodeUnlimitRequestBody, MenuCreateRequestBody,
     MessageTemplateSendMiniprogramData, MessageTemplateSendRequestBody, QrcodeCreateRequestBody,
     StableAccessTokenRequestBody, TagsCreateRequestBody, TagsCreateRequestItem,
     TagsMembersBatchtaggingRequestBody, UserInfoBatchgetItem, WxminiClient,
@@ -210,14 +211,61 @@ async fn request_getwxacodeunlimit() {
     let res = wxmini_client
         .request_getwxacodeunlimit(
             &GetwxacodeUnlimitRequestBody {
-                scene: "gid=xx&_scene=tses".into(),
+                scene: "_s=is&st=g&sid=1".into(),
                 page: Some("pages/post/index".into()),
-                check_path: None,
+                check_path: Some(false),
                 env_version: None,
                 width: None,
                 auto_color: None,
                 line_color: None,
                 is_hyaline: None,
+            },
+            Some("token"),
+        )
+        .await;
+
+    println!("res: {:?}", res);
+}
+
+#[tokio::test]
+async fn request_generatescheme() {
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::TRACE)
+        .init();
+
+    let wxmini_client = WxminiClient::new();
+    let res = wxmini_client
+        .request_generatescheme(
+            &GenerateSchemeRequestBody {
+                jump_wxa: Some(GenerateSchemeJumpWxa {
+                    path: Some("/pages/moment/index".into()),
+                    query: None,
+                    env_version: None,
+                }),
+                expire_time: None,
+                expire_type: None,
+                expire_interval: None,
+            },
+            Some("token"),
+        )
+        .await;
+
+    println!("res: {:?}", res);
+}
+
+#[tokio::test]
+async fn request_genwxashortlink() {
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::TRACE)
+        .init();
+
+    let wxmini_client = WxminiClient::new();
+    let res = wxmini_client
+        .request_genwxashortlink(
+            &GenerateShortLinkRequestBody {
+                page_url: "pages/moment/index".into(),
+                page_title: None,
+                is_permanent: Some(false),
             },
             Some("token"),
         )
