@@ -43,3 +43,21 @@ async fn send() {
 
     println!("res: {:?}", res);
 }
+
+#[tokio::test]
+async fn webhook_send() {
+    let wxcorp_client = WxcorpClient::new();
+    let res = wxcorp_client
+        .request_webhook_send(
+            &json!({
+                "msgtype": "text",
+                "text": {
+                    "content": "hello world"
+                }
+            }),
+            Some("bot key"),
+        )
+        .await;
+
+    println!("res: {:?}", res);
+}

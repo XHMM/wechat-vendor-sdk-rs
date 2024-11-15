@@ -59,3 +59,11 @@ wxcorp_api_post!(
     &Value,
     Value
 );
+
+wxcorp_api_post!(
+    request_webhook_send,
+    "https://qyapi.weixin.qq.com/cgi-bin/webhook/send",
+    (key: Option<&str>),
+    &Value,
+    Value
+);
