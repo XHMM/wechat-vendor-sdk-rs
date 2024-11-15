@@ -1,3 +1,6 @@
+use std::fmt::Debug;
+
+use serde::Serialize;
 use serde_json::Value;
 use tracing::{error, trace};
 
@@ -46,6 +49,33 @@ impl WxcorpClient {
             Err(WxcorpApiError::ApiCodeNotOk(data))
         }
     }
+
+    pub(crate) async fn call_post<D, B, F>(
+        &self,
+        url: &str,
+        query: &[(&str, Option<&str>)],
+        body: &B,
+        map: F,
+    ) -> Result<D, WxcorpApiError>
+    where
+        B: Serialize + Debug,
+        F: FnOnce(Value) -> Result<D, serde_json::Error>,
+    {
+        let client = reqwest::Client::new();
+        let response = client.post(url).query(query).json(body).send().await?;
+
+        let data: Value = response.json().await?;
+        trace!("wxcorp api post response: {:?}", data);
+
+        if data["errcode"] == 0 {
+            match map(data) {
+                Ok(data) => Ok(data),
+                Err(err) => Err(WxcorpApiError::WxcorpResDeserializeErr(err)),
+            }
+        } else {
+            Err(WxcorpApiError::ApiCodeNotOk(data))
+        }
+    }
 }
 
 #[macro_export]
@@ -65,5 +95,24 @@ macro_rules! wxcorp_api_get {
                 .await
             }
     }
+    };
+}
+
+#[macro_export]
+macro_rules! wxcorp_api_post {
+    ($(#[$attr:meta])* $name: ident, $url: tt, ($($v:ident: $t:ty),*), $req_body:ty, $ret_type:ty) => {
+        impl $crate::wxcorp::WxcorpClient {
+            $(#[$attr])*
+            pub async fn $name(&self, body: $req_body, $($v: $t),*) -> Result<$ret_type, $crate::wxcorp::WxcorpApiError> {
+                self.call_post(
+                    $url,
+                    // stringify! 将 ident 转为字符串形式
+                    &[$((stringify!($v), $v)),*],
+                    &body,
+                    |data| serde_json::from_value::<$ret_type>(data),
+                )
+                .await
+            }
+        }
     };
 }

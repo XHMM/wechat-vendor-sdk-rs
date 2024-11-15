@@ -23,3 +23,23 @@ async fn get_user_info() {
 
     println!("res: {:?}", res);
 }
+
+#[tokio::test]
+async fn send() {
+    let wxcorp_client = WxcorpClient::new();
+    let res = wxcorp_client
+        .request_send(
+            &json!({
+                "touser": "xx",
+                "msgtype" : "text",
+                "agentid": "1011112",
+                "text": {
+                    "content": "test"
+                }
+            }),
+            Some("token"),
+        )
+        .await;
+
+    println!("res: {:?}", res);
+}

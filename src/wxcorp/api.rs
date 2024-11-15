@@ -3,8 +3,9 @@
 //!
 
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
-use crate::{common::AccessTokenData, wxcorp_api_get};
+use crate::{common::AccessTokenData, wxcorp_api_get, wxcorp_api_post};
 
 wxcorp_api_get!(
     /// [获取 access token](https://developer.work.weixin.qq.com/document/path/91039)
@@ -49,4 +50,12 @@ wxcorp_api_get!(
     "https://qyapi.weixin.qq.com/cgi-bin/user/get",
     (access_token: Option<&str>, userid: Option<&str>),
     UserInfo
+);
+
+wxcorp_api_post!(
+    request_send,
+    "https://qyapi.weixin.qq.com/cgi-bin/message/send",
+    (access_token: Option<&str>),
+    &Value,
+    Value
 );
