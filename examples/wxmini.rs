@@ -196,7 +196,7 @@ async fn jsticket() {
     let wxmini_client = WxminiClient::new();
 
     let res = wxmini_client
-        .request_getticket(Some(WXMINI_ACCESS_TOKEN))
+        .request_getticket(Some(WXMINI_ACCESS_TOKEN), None)
         .await;
     println!("res: {:?}", res);
 }

@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use serde::Serialize;
 use serde_json::Value;
-use tracing::{error, trace};
+use tracing::error;
 
 use thiserror::Error;
 
@@ -37,8 +37,7 @@ impl WxcorpClient {
         let client = reqwest::Client::new();
         let response = client.get(url).query(query).send().await?;
         let data: Value = response.json().await?;
-        trace!("wxcorp api response: {:?}", data);
-        // println!("wxcorp api response: {:?}", data);
+        // trace!("wxcorp api response: {:?}", data);
 
         if data["errcode"] == 0 {
             match map(data) {
@@ -65,7 +64,7 @@ impl WxcorpClient {
         let response = client.post(url).query(query).json(body).send().await?;
 
         let data: Value = response.json().await?;
-        trace!("wxcorp api post response: {:?}", data);
+        // trace!("wxcorp api post response: {:?}", data);
 
         if data["errcode"] == 0 {
             match map(data) {
