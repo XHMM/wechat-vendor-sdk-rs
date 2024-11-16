@@ -366,7 +366,8 @@ wxmini_api_get!(
     /// [jssdk签名](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#62)
     request_getticket,
     "api.weixin.qq.com/cgi-bin/ticket/getticket?type=jsapi",
-    (access_token: Option<&str>),
+    // TODO: 待使用 bon.rs 改造，支持每个接口 builder 形式传入下述参数，from_appid 是用于云托管资源复用场景区别以哪个调用方身份的
+    (access_token: Option<&str>, from_appid: Option<&str>),
     GetTicketResponseData
 );
 
