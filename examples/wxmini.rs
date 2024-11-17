@@ -3,8 +3,8 @@ use wechat_vendor_sdk::wxmini::{
     ActionInfo, ActionScene, GenerateSchemeJumpWxa, GenerateSchemeRequestBody,
     GenerateShortLinkRequestBody, GetwxacodeUnlimitRequestBody, MenuCreateRequestBody,
     MessageTemplateSendMiniprogramData, MessageTemplateSendRequestBody, QrcodeCreateRequestBody,
-    StableAccessTokenRequestBody, TagsCreateRequestBody, TagsCreateRequestItem,
-    TagsMembersBatchtaggingRequestBody, UserInfoBatchgetItem, WxminiClient,
+    ScanQrcodeRequestBody, StableAccessTokenRequestBody, TagsCreateRequestBody,
+    TagsCreateRequestItem, TagsMembersBatchtaggingRequestBody, UserInfoBatchgetItem, WxminiClient,
 };
 
 #[tokio::main]
@@ -268,6 +268,25 @@ async fn request_genwxashortlink() {
                 is_permanent: Some(false),
             },
             Some("token"),
+        )
+        .await;
+
+    println!("res: {:?}", res);
+}
+
+#[tokio::test]
+async fn request_scan_qrcode() {
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::TRACE)
+        .init();
+
+    let wxmini_client = WxminiClient::new();
+    let res = wxmini_client
+        .request_scan_qrcode(
+            &ScanQrcodeRequestBody {
+                img_url: "https://xxx1717.jpg".into(),
+            },
+            Some("xxx"),
         )
         .await;
 

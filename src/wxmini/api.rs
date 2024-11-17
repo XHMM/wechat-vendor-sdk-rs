@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::{common::AccessTokenData, wxmini_api_get, wxmini_api_post};
+use crate::{common::AccessTokenData, wxmini_api_get, wxmini_api_post, wxmini_api_post_form};
 
 wxmini_api_get!(
     /// [获取 access token](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-access-token/getAccessToken.html)
@@ -479,4 +479,38 @@ wxmini_api_post!(
     (access_token: Option<&str>),
     &GenerateShortLinkRequestBody,
     GenerateShortLinkResponseData
+);
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ScanQrcodeRequestBody {
+    pub img_url: String,
+    // pub img
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ScanQrcodeCodeResult {
+    pub type_name: String,
+    pub data: String,
+    pub pos: Value,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ScanQrcodeImgSize {
+    pub w: i32,
+    pub h: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ScanQrcodeResponseData {
+    pub code_results: Vec<ScanQrcodeCodeResult>,
+    pub img_size: ScanQrcodeImgSize,
+}
+
+wxmini_api_post_form!(
+    /// [条形码识别](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/img-ocr/img/scanQRCode.html) 注意：并不支持识别小程序码
+    request_scan_qrcode,
+    "api.weixin.qq.com/cv/img/qrcode",
+    (access_token: Option<&str>),
+    &ScanQrcodeRequestBody,
+    ScanQrcodeResponseData
 );

@@ -81,22 +81,27 @@ impl WxminiClient {
         query: &[(&str, Option<&str>)],
         body: &B,
         map: F,
+        is_form: bool,
     ) -> Result<D, WxminiApiError>
     where
         B: Serialize + Debug,
         F: FnOnce(Value) -> Result<D, serde_json::Error>,
     {
         let client = reqwest::Client::new();
-        let response = client
+        let mut response = client
             .post(&format!(
                 "{}://{}",
                 if self.is_http { "http" } else { "https" },
                 endpoint_without_protocol
             ))
-            .query(query)
-            .json(body)
-            .send()
-            .await?;
+            .query(query);
+        if is_form {
+            response = response.form(body);
+        } else {
+            response = response.json(body);
+        }
+
+        let response = response.send().await?;
         let content_type = response
             .headers()
             .get(reqwest::header::CONTENT_TYPE)
@@ -157,8 +162,8 @@ macro_rules! wxmini_api_get {
 }
 
 #[macro_export]
-macro_rules! wxmini_api_post {
-    ($(#[$attr:meta])* $name: ident, $endpoint_without_protocol: tt, ($($v:ident: $t:ty),*), $req_body:ty, $ret_type:ty) => {
+macro_rules! wxmini_api_post_inner {
+    ($(#[$attr:meta])* $name: ident, $endpoint_without_protocol: tt, ($($v:ident: $t:ty),*), $req_body:ty, $ret_type:ty, $is_form:expr) => {
         impl $crate::wxmini::WxminiClient {
             $(#[$attr])*
             pub async fn $name(&self, body: $req_body, $($v: $t),*) -> Result<$ret_type, $crate::wxmini::WxminiApiError> {
@@ -170,9 +175,24 @@ macro_rules! wxmini_api_post {
                     &[$((stringify!($v), $v)),*],
                     &body,
                     |data| serde_json::from_value::<$ret_type>(data),
+                    $is_form,
                 )
                 .await
             }
         }
+    };
+}
+
+#[macro_export]
+macro_rules! wxmini_api_post {
+    ($(#[$attr:meta])* $name: ident, $endpoint_without_protocol: tt, ($($v:ident: $t:ty),*), $req_body:ty, $ret_type:ty) => {
+        $crate::wxmini_api_post_inner!($name, $endpoint_without_protocol, ($($v: $t),*), $req_body, $ret_type, false);
+    };
+}
+
+#[macro_export]
+macro_rules! wxmini_api_post_form {
+    ($(#[$attr:meta])* $name: ident, $endpoint_without_protocol: tt, ($($v:ident: $t:ty),*), $req_body:ty, $ret_type:ty) => {
+        $crate::wxmini_api_post_inner!($name, $endpoint_without_protocol, ($($v: $t),*), $req_body, $ret_type, true);
     };
 }
