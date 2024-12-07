@@ -232,6 +232,26 @@ wxmini_api_post!(
 );
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct CreatewxaqrcodeRequestBody {
+    pub path: String,
+    pub width: Option<u32>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreatewxaqrcodeResponseData {
+    pub buffer: Vec<u8>,
+}
+
+wxmini_api_post!(
+    /// [获取小程序二维码](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/qr-code/createQRCode.html)
+    request_createwxaqrcode,
+    "api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode",
+    (access_token: Option<&str>),
+    &CreatewxaqrcodeRequestBody,
+    CreatewxaqrcodeResponseData
+);
+
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ActionScene {
     Str { scene_str: String },

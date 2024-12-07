@@ -1884,7 +1884,7 @@ dependencies = [
 
 [[package]]
 name = "wechat-vendor-sdk"
-version = "0.3.21"
+version = "0.3.22"
 dependencies = [
  "aes-gcm",
  "base64",

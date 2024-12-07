@@ -1,10 +1,11 @@
 use serde_json::json;
 use wechat_vendor_sdk::wxmini::{
-    ActionInfo, ActionScene, GenerateSchemeJumpWxa, GenerateSchemeRequestBody,
-    GenerateShortLinkRequestBody, GetwxacodeUnlimitRequestBody, MenuCreateRequestBody,
-    MessageTemplateSendMiniprogramData, MessageTemplateSendRequestBody, QrcodeCreateRequestBody,
-    ScanQrcodeRequestBody, StableAccessTokenRequestBody, TagsCreateRequestBody,
-    TagsCreateRequestItem, TagsMembersBatchtaggingRequestBody, UserInfoBatchgetItem, WxminiClient,
+    ActionInfo, ActionScene, CreatewxaqrcodeRequestBody, GenerateSchemeJumpWxa,
+    GenerateSchemeRequestBody, GenerateShortLinkRequestBody, GetwxacodeUnlimitRequestBody,
+    MenuCreateRequestBody, MessageTemplateSendMiniprogramData, MessageTemplateSendRequestBody,
+    QrcodeCreateRequestBody, ScanQrcodeRequestBody, StableAccessTokenRequestBody,
+    TagsCreateRequestBody, TagsCreateRequestItem, TagsMembersBatchtaggingRequestBody,
+    UserInfoBatchgetItem, WxminiClient,
 };
 
 #[tokio::main]
@@ -284,9 +285,29 @@ async fn request_scan_qrcode() {
     let res = wxmini_client
         .request_scan_qrcode(
             &ScanQrcodeRequestBody {
-                img_url: "https://xxx1717.jpg".into(),
+                img_url: "https://xxx.jpg".into(),
             },
-            Some("xxx"),
+            Some("token"),
+        )
+        .await;
+
+    println!("res: {:?}", res);
+}
+
+#[tokio::test]
+async fn request_createwxaqrcode() {
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::TRACE)
+        .init();
+
+    let wxmini_client = WxminiClient::new();
+    let res = wxmini_client
+        .request_createwxaqrcode(
+            &CreatewxaqrcodeRequestBody {
+                path: "pages/moment/index".into(),
+                width: None,
+            },
+            Some("token"),
         )
         .await;
 
