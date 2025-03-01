@@ -28,6 +28,7 @@ impl WxcorpClient {
     pub(crate) async fn call_get<D, F>(
         &self,
         url: &str,
+        // TODO: 待改造为 bon
         query: &[(&str, Option<&str>)],
         map: F,
     ) -> Result<D, WxcorpApiError>

@@ -67,3 +67,94 @@ wxcorp_api_post!(
     &Value,
     Value
 );
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ExternalContactListResponseData {
+    pub external_userid: Vec<String>,
+}
+wxcorp_api_get!(
+    /// [获取客户列表](https://developer.work.weixin.qq.com/document/path/92113)
+    request_external_contact_list,
+    "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/list",
+    (access_token: Option<&str>,  userid: Option<&str>),
+    ExternalContactListResponseData
+);
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ExternalContactGetResponseData {
+    pub external_contact: Value,
+    pub follow_user: Vec<Value>,
+    pub next_cursor: Option<String>,
+}
+wxcorp_api_get!(
+    /// [获取客户详情](https://developer.work.weixin.qq.com/document/path/92114)
+    request_external_contact_get,
+    "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get",
+    (access_token: Option<&str>,  external_userid: Option<&str>, cursor: Option<&str>),
+    ExternalContactGetResponseData
+);
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ExternalContactBatchGetByUserRequestBody {
+    pub userid_list: Vec<String>,
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ExternalContactBatchGetByUserResponseData {
+    pub external_contact_list: Vec<Value>,
+    pub next_cursor: Option<String>,
+    pub fail_info: Option<Value>,
+}
+wxcorp_api_post!(
+    /// [批量获取客户详情](https://developer.work.weixin.qq.com/document/path/92994)
+    request_external_contact_batch_get_by_user,
+    "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/batch/get_by_user",
+    (access_token: Option<&str>),
+    &ExternalContactBatchGetByUserRequestBody,
+    ExternalContactBatchGetByUserResponseData
+);
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ExternalContactGroupChatListRequestBody {
+    pub status_filter: Option<i64>,
+    pub owner_filter: Option<Value>,
+    pub cursor: Option<String>,
+    pub limit: i64,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ExternalContactGroupChatListItem {
+    pub chat_id: String,
+    pub status: i64,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ExternalContactGroupChatListResponseData {
+    pub group_chat_list: Vec<ExternalContactGroupChatListItem>,
+    pub next_cursor: Option<String>,
+}
+wxcorp_api_post!(
+    request_external_contact_group_chat_list,
+    "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/groupchat/list",
+    (access_token: Option<&str>),
+    &ExternalContactGroupChatListRequestBody,
+    ExternalContactGroupChatListResponseData
+);
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ExternalContactGroupChatGetRequestBody {
+    pub chat_id: String,
+    pub need_name: Option<i32>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ExternalContactGroupChatGetResponseData {
+    pub group_chat: Value,
+}
+wxcorp_api_post!(
+    request_external_contact_group_chat_get,
+    "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/groupchat/get",
+    (access_token: Option<&str>),
+    &ExternalContactGroupChatGetRequestBody,
+    ExternalContactGroupChatGetResponseData
+);
