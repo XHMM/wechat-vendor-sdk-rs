@@ -2,7 +2,7 @@ use chrono::TimeZone;
 use error::WxpayApiError;
 use rsa::{pkcs8::DecodePublicKey, Pkcs1v15Sign};
 use serde_json::Value;
-use utils::{generate_wxpay_signature, WxpayResponse};
+use utils::{generate_wxpay_request_signature, WxpayResponse};
 
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
@@ -191,7 +191,7 @@ pub async fn request_batch_transfer<'a>(
     let body = serde_json::to_string(&body).expect("failed to serialize body");
 
     let (signature, timestamp, nonce_str) =
-        generate_wxpay_signature(method, endpoint, mch_private_key, Some(&body))?;
+        generate_wxpay_request_signature(method, endpoint, mch_private_key, Some(&body))?;
 
     let client = Client::new();
     let response = client.post(url)
@@ -262,7 +262,7 @@ pub async fn request_jsapi_order<'a>(
     let body = serde_json::to_string(&body).expect("failed to serialize body");
 
     let (signature, timestamp, nonce_str) =
-        generate_wxpay_signature(method, endpoint, mch_private_key, Some(&body))?;
+        generate_wxpay_request_signature(method, endpoint, mch_private_key, Some(&body))?;
 
     let client = Client::new();
     let response = client.post(url)
@@ -332,7 +332,7 @@ pub async fn request_order_detail<'a>(
     let method = "GET";
 
     let (signature, timestamp, nonce_str) =
-        generate_wxpay_signature(method, &endpoint, mch_private_key, None)?;
+        generate_wxpay_request_signature(method, &endpoint, mch_private_key, None)?;
 
     let client = Client::new();
     let response = client.get(url)
@@ -370,7 +370,7 @@ pub async fn request_close_order<'a>(
     let body = serde_json::to_string(&body).expect("failed to serialize body");
 
     let (signature, timestamp, nonce_str) =
-        generate_wxpay_signature(method, &endpoint, mch_private_key, Some(&body))?;
+        generate_wxpay_request_signature(method, &endpoint, mch_private_key, Some(&body))?;
 
     let client = Client::new();
     let response = client.post(url)
@@ -450,7 +450,7 @@ pub async fn request_refund_order<'a>(
     let body = serde_json::to_string(&body).expect("failed to serialize body");
 
     let (signature, timestamp, nonce_str) =
-        generate_wxpay_signature(method, endpoint, mch_private_key, Some(&body))?;
+        generate_wxpay_request_signature(method, endpoint, mch_private_key, Some(&body))?;
 
     let client = Client::new();
     let response = client.post(url)
@@ -496,7 +496,7 @@ pub async fn request_refund_detail<'a>(
     let method = "GET";
 
     let (signature, timestamp, nonce_str) =
-        generate_wxpay_signature(method, &endpoint, mch_private_key, None)?;
+        generate_wxpay_request_signature(method, &endpoint, mch_private_key, None)?;
 
     let client = Client::new();
     let response = client.get(url)
@@ -521,7 +521,7 @@ fn test_generate_wxpay_signature() {
     let method = "POST";
     let url_path = "/v3/transfer/batches";
 
-    match generate_wxpay_signature(method, url_path, private_key, Some(r#"body"#)) {
+    match generate_wxpay_request_signature(method, url_path, private_key, Some(r#"body"#)) {
         Ok((signature, timestamp, nonce_str)) => {
             println!("签名: {}", signature);
             println!("时间戳: {}", timestamp);

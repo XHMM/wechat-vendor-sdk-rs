@@ -20,7 +20,7 @@ pub enum WxpayResponse<D> {
 }
 
 /// 生成微信支付API请求签名
-pub fn generate_wxpay_signature(
+pub fn generate_wxpay_request_signature(
     method: &str,
     url_path: &str,
     private_key: &str,
@@ -39,6 +39,26 @@ pub fn generate_wxpay_signature(
         content_to_sign.push_str(body_content);
     }
     content_to_sign.push('\n');
+
+    let signature = sha256_ras_and_base64(private_key, &content_to_sign)?;
+
+    Ok((signature, timestamp, nonce_str))
+}
+
+/// 生成微信支付调起支付签名
+pub fn generate_wxpay_pay_signature(
+    app_id: &str,
+    prepay_id: &str,
+    private_key: &str,
+) -> Result<(String, String, String), WxpayApiError> {
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_secs()
+        .to_string();
+    let nonce_str = generate_noncestr(32);
+
+    let content_to_sign = format!("{}\n{}\n{}\n{}\n", app_id, timestamp, nonce_str, prepay_id);
 
     let signature = sha256_ras_and_base64(private_key, &content_to_sign)?;
 
