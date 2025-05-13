@@ -1,8 +1,8 @@
 use chrono::TimeZone;
-use error::WxpayApiError;
+use error::{WxPayFailedResponse, WxpayApiError};
 use rsa::{pkcs8::DecodePublicKey, Pkcs1v15Sign};
 use serde_json::Value;
-use utils::{generate_wxpay_request_signature, WxpayResponse};
+use utils::generate_wxpay_request_signature;
 
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
@@ -182,7 +182,7 @@ pub async fn request_batch_transfer<'a>(
     mch_serial_no: &'a str,
     // 微信支付平台证书序列号
     wxpay_serial_no: &'a str,
-) -> Result<WxpayResponse<serde_json::Value>, WxpayApiError> {
+) -> Result<serde_json::Value, WxpayApiError> {
     let url_base = "https://api.mch.weixin.qq.com";
     let endpoint = "/v3/transfer/batches";
     let url = format!("{}{}", url_base, endpoint);
@@ -204,9 +204,14 @@ pub async fn request_batch_transfer<'a>(
         .body(body)
         .send()
         .await?;
-
-    let result: WxpayResponse<serde_json::Value> = response.json().await?;
-    Ok(result)
+    let status = response.status();
+    if status == 200 {
+        let result: serde_json::Value = response.json().await?;
+        Ok(result)
+    } else {
+        let result: WxPayFailedResponse = response.json().await?;
+        Err(WxpayApiError::WxpayError(result))
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -253,7 +258,7 @@ pub async fn request_jsapi_order<'a>(
     mchid: &'a str,
     mch_private_key: &'a str,
     mch_serial_no: &'a str,
-) -> Result<WxpayResponse<JsapiOrderResponseData>, WxpayApiError> {
+) -> Result<JsapiOrderResponseData, WxpayApiError> {
     let url_base = "https://api.mch.weixin.qq.com";
     let endpoint = "/v3/pay/transactions/jsapi";
     let url = format!("{}{}", url_base, endpoint);
@@ -275,8 +280,14 @@ pub async fn request_jsapi_order<'a>(
         .send()
         .await?;
 
-    let result: WxpayResponse<JsapiOrderResponseData> = response.json().await?;
-    Ok(result)
+    let status = response.status();
+    if status == 200 {
+        let result: JsapiOrderResponseData = response.json().await?;
+        Ok(result)
+    } else {
+        let result: WxPayFailedResponse = response.json().await?;
+        Err(WxpayApiError::WxpayError(result))
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -322,7 +333,7 @@ pub async fn request_order_detail<'a>(
     mchid: &'a str,
     mch_private_key: &'a str,
     mch_serial_no: &'a str,
-) -> Result<WxpayResponse<OutTradeNoResponseData>, WxpayApiError> {
+) -> Result<OutTradeNoResponseData, WxpayApiError> {
     let url_base = "https://api.mch.weixin.qq.com";
     let endpoint = format!(
         "/v3/pay/transactions/out-trade-no/{}?mchid={}",
@@ -344,8 +355,14 @@ pub async fn request_order_detail<'a>(
         .send()
         .await?;
 
-    let result: WxpayResponse<OutTradeNoResponseData> = response.json().await?;
-    Ok(result)
+    let status = response.status();
+    if status == 200 {
+        let result: OutTradeNoResponseData = response.json().await?;
+        Ok(result)
+    } else {
+        let result: WxPayFailedResponse = response.json().await?;
+        Err(WxpayApiError::WxpayError(result))
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -361,7 +378,7 @@ pub async fn request_close_order<'a>(
     mchid: &'a str,
     mch_private_key: &'a str,
     mch_serial_no: &'a str,
-) -> Result<WxpayResponse<()>, WxpayApiError> {
+) -> Result<(), WxpayApiError> {
     let url_base = "https://api.mch.weixin.qq.com";
     let endpoint = format!("/v3/pay/transactions/out-trade-no/{}/close", out_trade_no);
     let url = format!("{}{}", url_base, endpoint);
@@ -384,10 +401,10 @@ pub async fn request_close_order<'a>(
         .await?;
     let status = response.status();
     if status == 204 {
-        Ok(WxpayResponse::Success(()))
+        Ok(())
     } else {
-        let result: WxpayResponse<()> = response.json().await?;
-        Ok(result)
+        let result: WxPayFailedResponse = response.json().await?;
+        Err(WxpayApiError::WxpayError(result))
     }
 }
 
@@ -441,7 +458,7 @@ pub async fn request_refund_order<'a>(
     mchid: &'a str,
     mch_private_key: &'a str,
     mch_serial_no: &'a str,
-) -> Result<WxpayResponse<RefundOrderResponseData>, WxpayApiError> {
+) -> Result<RefundOrderResponseData, WxpayApiError> {
     let url_base = "https://api.mch.weixin.qq.com";
     let endpoint = "/v3/refund/domestic/refunds";
     let url = format!("{}{}", url_base, endpoint);
@@ -463,8 +480,14 @@ pub async fn request_refund_order<'a>(
         .send()
         .await?;
 
-    let result: WxpayResponse<RefundOrderResponseData> = response.json().await?;
-    Ok(result)
+    let status = response.status();
+    if status == 200 {
+        let result: RefundOrderResponseData = response.json().await?;
+        Ok(result)
+    } else {
+        let result: WxPayFailedResponse = response.json().await?;
+        Err(WxpayApiError::WxpayError(result))
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -489,7 +512,7 @@ pub async fn request_refund_detail<'a>(
     mchid: &'a str,
     mch_private_key: &'a str,
     mch_serial_no: &'a str,
-) -> Result<WxpayResponse<RefundDetailResponseData>, WxpayApiError> {
+) -> Result<RefundDetailResponseData, WxpayApiError> {
     let url_base = "https://api.mch.weixin.qq.com";
     let endpoint = format!("/v3/refund/domestic/refunds/{}", out_refund_no);
     let url = format!("{}{}", url_base, endpoint);
@@ -508,8 +531,14 @@ pub async fn request_refund_detail<'a>(
         .send()
         .await?;
 
-    let result: WxpayResponse<RefundDetailResponseData> = response.json().await?;
-    Ok(result)
+    let status = response.status();
+    if status == 200 {
+        let result: RefundDetailResponseData = response.json().await?;
+        Ok(result)
+    } else {
+        let result: WxPayFailedResponse = response.json().await?;
+        Err(WxpayApiError::WxpayError(result))
+    }
 }
 
 #[test]

@@ -5,20 +5,6 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use super::error::WxpayApiError;
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct WxPayFailedResponse {
-    pub code: String,
-    pub message: String,
-    pub detail: Option<serde_json::Value>,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(untagged)]
-pub enum WxpayResponse<D> {
-    Failed(WxPayFailedResponse),
-    Success(D),
-}
-
 /// 生成微信支付API请求签名
 pub fn generate_wxpay_request_signature(
     method: &str,

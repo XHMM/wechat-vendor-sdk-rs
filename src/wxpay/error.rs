@@ -1,4 +1,12 @@
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct WxPayFailedResponse {
+    pub code: String,
+    pub message: String,
+    pub detail: Option<serde_json::Value>,
+}
 
 #[derive(Error, Debug)]
 pub enum WxpayApiError {
@@ -22,4 +30,7 @@ pub enum WxpayApiError {
 
     #[error("base64 decode error: {0}")]
     Base64DecodeError(#[from] base64::DecodeError),
+
+    #[error("wxpay error: {}", .0.message)]
+    WxpayError(WxPayFailedResponse),
 }

@@ -11,6 +11,19 @@ async fn main() {
     // call test below
 }
 
+#[macro_export]
+macro_rules! read_test_file {
+    ($filename:expr) => {
+        std::fs::read_to_string(format!(
+            "{}/wxpay_local_test_data/{}",
+            env!("CARGO_MANIFEST_DIR"),
+            $filename
+        ))
+        .unwrap()
+        .as_str()
+    };
+}
+
 #[tokio::test]
 async fn test_batch_transfer() {
     let res = request_batch_transfer()
@@ -31,21 +44,10 @@ async fn test_batch_transfer() {
             transfer_scene_id: Some("1000".into()),
             notify_url: Some("https://xxx".into()),
         })
-        .mch_private_key(
-            std::fs::read_to_string("../wxpay_local_test_data/mch_private_key")
-                .unwrap()
-                .as_str(),
-        )
-        .mch_serial_no(
-            std::fs::read_to_string("../wxpay_local_test_data/mch_serial_no")
-                .unwrap()
-                .as_str(),
-        )
-        .mchid(
-            std::fs::read_to_string("../wxpay_local_test_data/mchid")
-                .unwrap()
-                .as_str(),
-        )
+        .mch_private_key(read_test_file!("mch_private_key"))
+        .mch_serial_no(read_test_file!("mch_serial_no"))
+        .mchid(read_test_file!("mchid"))
+        .wxpay_serial_no(read_test_file!("wxpay_serial_no"))
         .call()
         .await;
     println!("res: {:?}", res);
@@ -83,21 +85,9 @@ async fn test_jsapi_order() {
             }),
             settle_info: json!({}),
         })
-        .mch_private_key(
-            std::fs::read_to_string("../wxpay_local_test_data/mch_private_key")
-                .unwrap()
-                .as_str(),
-        )
-        .mch_serial_no(
-            std::fs::read_to_string("../wxpay_local_test_data/mch_serial_no")
-                .unwrap()
-                .as_str(),
-        )
-        .mchid(
-            std::fs::read_to_string("../wxpay_local_test_data/mchid")
-                .unwrap()
-                .as_str(),
-        )
+        .mch_private_key(read_test_file!("mch_private_key"))
+        .mch_serial_no(read_test_file!("mch_serial_no"))
+        .mchid(read_test_file!("mchid"))
         .call()
         .await;
     println!("res: {:?}", res);
@@ -107,21 +97,9 @@ async fn test_jsapi_order() {
 async fn test_order_detail() {
     let res = request_order_detail()
         .out_trade_no("testouttrade2")
-        .mch_private_key(
-            std::fs::read_to_string("../wxpay_local_test_data/mch_private_key")
-                .unwrap()
-                .as_str(),
-        )
-        .mch_serial_no(
-            std::fs::read_to_string("../wxpay_local_test_data/mch_serial_no")
-                .unwrap()
-                .as_str(),
-        )
-        .mchid(
-            std::fs::read_to_string("../wxpay_local_test_data/mchid")
-                .unwrap()
-                .as_str(),
-        )
+        .mch_private_key(read_test_file!("mch_private_key"))
+        .mch_serial_no(read_test_file!("mch_serial_no"))
+        .mchid(read_test_file!("mchid"))
         .call()
         .await;
     println!("res: {:?}", res);
@@ -131,26 +109,12 @@ async fn test_order_detail() {
 async fn test_close_order() {
     let res = request_close_order()
         .body(CloseOrderRequestBody {
-            mchid: std::fs::read_to_string("../wxpay_local_test_data/mchid")
-                .unwrap()
-                .as_str(),
+            mchid: read_test_file!("mchid"),
         })
         .out_trade_no("testouttrade2")
-        .mch_private_key(
-            std::fs::read_to_string("../wxpay_local_test_data/mch_private_key")
-                .unwrap()
-                .as_str(),
-        )
-        .mch_serial_no(
-            std::fs::read_to_string("../wxpay_local_test_data/mch_serial_no")
-                .unwrap()
-                .as_str(),
-        )
-        .mchid(
-            std::fs::read_to_string("../wxpay_local_test_data/mchid")
-                .unwrap()
-                .as_str(),
-        )
+        .mch_private_key(read_test_file!("mch_private_key"))
+        .mch_serial_no(read_test_file!("mch_serial_no"))
+        .mchid(read_test_file!("mchid"))
         .call()
         .await;
     println!("res: {:?}", res);
@@ -160,21 +124,9 @@ async fn test_close_order() {
 async fn test_refund_detail() {
     let res = request_refund_detail()
         .out_refund_no("testrefund2")
-        .mch_private_key(
-            std::fs::read_to_string("../wxpay_local_test_data/mch_private_key")
-                .unwrap()
-                .as_str(),
-        )
-        .mch_serial_no(
-            std::fs::read_to_string("../wxpay_local_test_data/mch_serial_no")
-                .unwrap()
-                .as_str(),
-        )
-        .mchid(
-            std::fs::read_to_string("../wxpay_local_test_data/mchid")
-                .unwrap()
-                .as_str(),
-        )
+        .mch_private_key(read_test_file!("mch_private_key"))
+        .mch_serial_no(read_test_file!("mch_serial_no"))
+        .mchid(read_test_file!("mchid"))
         .call()
         .await;
     println!("res: {:?}", res);
