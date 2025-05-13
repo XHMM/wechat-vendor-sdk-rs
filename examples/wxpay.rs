@@ -1,5 +1,5 @@
 use serde_json::json;
-use wechat_vendor_sdk::wxpay::{
+use wechat_vendor_sdk::wxpay::api::{
     request_batch_transfer, request_close_order, request_jsapi_order, request_order_detail,
     request_refund_detail, request_refund_order, BatchTransferRequestBody, CloseOrderRequestBody,
     JsapiOrderAmount, JsapiOrderPayer, JsapiOrderRequestBody, OutTradeNoResponseData,

@@ -87,3 +87,22 @@ pub fn sha256_ras_and_base64(
     let sig = general_purpose::STANDARD.encode(&signature);
     Ok(sig)
 }
+
+#[test]
+fn test_generate_wxpay_signature() {
+    let private_key = "-----BEGIN PRIVATE KEY-----
+...
+-----END PRIVATE KEY-----
+";
+    let method = "POST";
+    let url_path = "/v3/transfer/batches";
+
+    match generate_wxpay_request_signature(method, url_path, private_key, Some(r#"body"#)) {
+        Ok((signature, timestamp, nonce_str)) => {
+            println!("签名: {}", signature);
+            println!("时间戳: {}", timestamp);
+            println!("随机字符串: {}", nonce_str);
+        }
+        Err(e) => println!("生成签名失败: {}", e),
+    }
+}
