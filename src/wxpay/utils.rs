@@ -44,7 +44,10 @@ pub fn generate_wxpay_pay_signature(
         .to_string();
     let nonce_str = generate_noncestr(32);
 
-    let content_to_sign = format!("{}\n{}\n{}\n{}\n", app_id, timestamp, nonce_str, prepay_id);
+    let content_to_sign = format!(
+        "{}\n{}\n{}\nprepay_id={}\n",
+        app_id, timestamp, nonce_str, prepay_id
+    );
 
     let signature = sha256_ras_and_base64(private_key, &content_to_sign)?;
 
