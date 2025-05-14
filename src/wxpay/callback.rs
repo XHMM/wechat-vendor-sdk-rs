@@ -139,6 +139,27 @@ pub enum WxpayBatchTransferCallbackResourceData {
 /// [支付成功回调通知](https://pay.weixin.qq.com/doc/v3/merchant/4012791902)解密后的数据（和查询订单详情返回格式一致）
 pub type WxpayPayCallbackResourceData = OutTradeNoResponseData;
 
+/// [退款结果回调通知](https://pay.weixin.qq.com/doc/v3/merchant/4012791906)解密后的数据
+#[derive(Debug, Deserialize, Serialize)]
+pub struct WxpayRefundCallbackResourceData {
+    pub mchid: String,
+    pub transaction_id: String,
+    pub out_trade_no: String,
+    pub refund_id: String,
+    pub out_refund_no: String,
+    pub refund_status: String,
+    pub success_time: Option<String>,
+    pub user_received_account: String,
+    pub amount: RefundCallbackAmount,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RefundCallbackAmount {
+    pub total: i32,
+    pub refund: i32,
+    pub payer_total: i32,
+    pub payer_refund: i32,
+}
+
 #[test]
 fn test_verify_wxpay_callback_signature() {
     let wx_public_key = "-----BEGIN PUBLIC KEY-----

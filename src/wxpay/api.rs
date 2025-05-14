@@ -80,7 +80,7 @@ pub async fn request_batch_transfer<'a>(
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize)]
 pub struct JsapiOrderRequestBody<'a> {
     // 小程序appid
     pub appid: &'a str,
@@ -88,26 +88,33 @@ pub struct JsapiOrderRequestBody<'a> {
     pub mchid: &'a str,
     pub description: &'a str,
     pub out_trade_no: &'a str,
-    // 文档里有些字段写的是选填，但是请求时字段不存在还是会报错，所以这里未定义为 Option
-    pub time_expire: &'a str,
-    pub attach: &'a str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub time_expire: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attach: Option<&'a str>,
     pub notify_url: &'a str,
-    pub goods_tag: &'a str,
-    pub support_fapiao: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub goods_tag: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub support_fapiao: Option<bool>,
     pub amount: JsapiOrderAmount<'a>,
     pub payer: JsapiOrderPayer<'a>,
-    pub detail: serde_json::Value,
-    pub scene_info: serde_json::Value,
-    pub settle_info: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detail: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scene_info: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub settle_info: Option<serde_json::Value>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize)]
 pub struct JsapiOrderAmount<'a> {
     pub total: i32,
-    pub currency: &'a str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency: Option<&'a str>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize)]
 pub struct JsapiOrderPayer<'a> {
     pub openid: &'a str,
 }
@@ -194,7 +201,7 @@ pub struct SceneInfo {
 
 /// [商户订单号查询订单](https://pay.weixin.qq.com/doc/v3/merchant/4012791900)
 #[bon::builder]
-pub async fn request_order_detail<'a>(
+pub async fn request_order_detail_by_out_trade_no<'a>(
     out_trade_no: &'a str,
     mchid: &'a str,
     mch_private_key: &'a str,
@@ -275,7 +282,7 @@ pub async fn request_close_order<'a>(
 }
 
 #[derive(Debug, Serialize)]
-#[serde(untagged, rename_all = "PascalCase")]
+#[serde(rename_all = "snake_case")]
 pub enum OrderId {
     OutTradeNo(String),
     TransactionId(String),
@@ -284,7 +291,8 @@ pub enum OrderId {
 #[derive(Debug, Serialize)]
 pub struct RefundAmount<'a> {
     pub refund: i32,
-    pub from: Option<Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub from: Option<Vec<Value>>,
     pub total: i32,
     pub currency: &'a str,
 }
@@ -294,10 +302,14 @@ pub struct RefundOrderRequestBody<'a> {
     pub order_id: OrderId,
 
     pub out_refund_no: &'a str,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify_url: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub funds_account: Option<&'a str>,
     pub amount: RefundAmount<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub goods_detail: Option<Vec<Value>>,
 }
 
