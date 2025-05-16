@@ -175,19 +175,19 @@ pub struct OutTradeNoResponseData {
     pub bank_type: Option<String>,
     pub attach: Option<String>,
     pub success_time: Option<String>,
-    pub payer: Option<Payer>,
-    pub amount: Option<Amount>,
-    pub scene_info: Option<SceneInfo>,
+    pub payer: Option<OrderDetailPayer>,
+    pub amount: Option<OrderDetailAmount>,
+    pub scene_info: Option<OrderDetailSceneInfo>,
     pub promotion_detail: Option<Vec<Value>>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Payer {
+pub struct OrderDetailPayer {
     pub openid: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Amount {
+pub struct OrderDetailAmount {
     pub total: Option<i32>,
     pub payer_total: Option<i32>,
     pub currency: Option<String>,
@@ -195,7 +195,7 @@ pub struct Amount {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct SceneInfo {
+pub struct OrderDetailSceneInfo {
     pub device_id: Option<String>,
 }
 

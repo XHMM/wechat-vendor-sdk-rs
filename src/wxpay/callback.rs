@@ -136,8 +136,42 @@ pub enum WxpayBatchTransferCallbackResourceData {
     Finished(WxpayBatchTransferCallbackResourceDataFinished),
 }
 
-/// [支付成功回调通知](https://pay.weixin.qq.com/doc/v3/merchant/4012791902)解密后的数据（和查询订单详情返回格式一致）
-pub type WxpayPayCallbackResourceData = OutTradeNoResponseData;
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PayCallbackPayer {
+    pub openid: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PayCallbackAmount {
+    pub total: i32,
+    pub payer_total: i32,
+    pub currency: String,
+    pub payer_currency: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PayCallbackSceneInfo {
+    pub device_id: String,
+}
+
+/// [支付成功回调通知](https://pay.weixin.qq.com/doc/v3/merchant/4012791902)解密后的数据
+#[derive(Debug, Deserialize, Serialize)]
+pub struct WxpayPayCallbackResourceData {
+    pub appid: String,
+    pub mchid: String,
+    pub out_trade_no: String,
+    pub transaction_id: String,
+    pub trade_type: String,
+    pub trade_state: String,
+    pub trade_state_desc: String,
+    pub bank_type: String,
+    pub attach: Option<String>,
+    pub success_time: String,
+    pub payer: PayCallbackPayer,
+    pub amount: PayCallbackAmount,
+    pub scene_info: Option<PayCallbackSceneInfo>,
+    pub promotion_detail: Option<Vec<Value>>,
+}
 
 /// [退款结果回调通知](https://pay.weixin.qq.com/doc/v3/merchant/4012791906)解密后的数据
 #[derive(Debug, Deserialize, Serialize)]
