@@ -418,3 +418,185 @@ pub async fn request_refund_detail<'a>(
         Err(WxpayApiError::WxpayError(result))
     }
 }
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum BatchId {
+    WxBatchId(String),
+    OutBatchNo(String),
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct BatchTransferDetailResponse {
+    pub transfer_batch: TransferBatchInfo,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transfer_detail_list: Option<Vec<TransferDetailInfo>>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct TransferBatchInfo {
+    pub mchid: String,
+    pub out_batch_no: String,
+    pub batch_id: String,
+    pub appid: String,
+    pub batch_status: String,
+    pub batch_type: String,
+    pub batch_name: String,
+    pub batch_remark: String,
+    pub close_reason: Option<String>,
+    pub total_amount: u64,
+    pub total_num: u64,
+    pub create_time: String,
+    pub update_time: Option<String>,
+    pub success_amount: Option<u64>,
+    pub success_num: Option<u64>,
+    pub fail_amount: Option<u64>,
+    pub fail_num: Option<u64>,
+    pub transfer_scene_id: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct TransferDetailInfo {
+    pub detail_id: String,
+    pub out_detail_no: String,
+    pub detail_status: String,
+    pub transfer_amount: u64,
+    pub transfer_remark: String,
+    pub fail_reason: Option<String>,
+    pub openid: String,
+    pub user_name: Option<String>,
+    pub initiate_time: String,
+    pub update_time: String,
+}
+
+/// [查询转账批次单](https://pay.weixin.qq.com/doc/v3/merchant/4012458877)
+#[bon::builder]
+pub async fn request_batch_transfer_detail<'a>(
+    batch_id: BatchId,
+    need_query_detail: bool,
+    offset: Option<u32>,
+    limit: Option<u32>,
+    detail_status: Option<&'a str>,
+    mchid: &'a str,
+    mch_private_key: &'a str,
+    mch_serial_no: &'a str,
+) -> Result<BatchTransferDetailResponse, WxpayApiError> {
+    let url_base = "https://api.mch.weixin.qq.com";
+    let mut endpoint = match &batch_id {
+        BatchId::WxBatchId(id) => format!("/v3/transfer/batches/batch-id/{}", id),
+        BatchId::OutBatchNo(no) => format!("/v3/transfer/batches/out-batch-no/{}", no),
+    };
+
+    let mut query_params = Vec::new();
+    query_params.push(format!("need_query_detail={}", need_query_detail));
+    if let Some(offset) = offset {
+        query_params.push(format!("offset={}", offset));
+    }
+    if let Some(limit) = limit {
+        query_params.push(format!("limit={}", limit));
+    }
+    if let Some(detail_status) = detail_status {
+        query_params.push(format!("detail_status={}", detail_status));
+    }
+
+    if !query_params.is_empty() {
+        endpoint.push_str("?");
+        endpoint.push_str(&query_params.join("&"));
+    }
+
+    let url = format!("{}{}", url_base, endpoint);
+    let method = "GET";
+
+    let (signature, timestamp, nonce_str) =
+        generate_wxpay_request_signature(method, &endpoint, mch_private_key, None)?;
+
+    let client = Client::new();
+    let response = client.get(url)
+        .header("Content-Type", "application/json")
+        .header("Accept", "application/json")
+        .header("User-Agent", "wechat-vendor-sdk/0.0.0")
+        .header("Authorization", format!("WECHATPAY2-SHA256-RSA2048 mchid=\"{}\",nonce_str=\"{}\",signature=\"{}\",timestamp=\"{}\",serial_no=\"{}\"", 
+            mchid, nonce_str, signature, timestamp, mch_serial_no))
+        .send()
+        .await?;
+
+    let status = response.status();
+    if status == 200 {
+        let result: BatchTransferDetailResponse = response.json().await?;
+        Ok(result)
+    } else {
+        let result: WxPayFailedResponse = response.json().await?;
+        Err(WxpayApiError::WxpayError(result))
+    }
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DetailId {
+    OutDetailNo(String),
+    DetailId(String),
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct TransferDetailResponse {
+    pub mchid: String,
+    pub out_batch_no: String,
+    pub batch_id: String,
+    pub appid: String,
+    pub out_detail_no: String,
+    pub detail_id: String,
+    pub detail_status: String,
+    pub transfer_amount: u64,
+    pub transfer_remark: String,
+    pub fail_reason: Option<String>,
+    pub openid: String,
+    pub user_name: Option<String>,
+    pub initiate_time: String,
+    pub update_time: String,
+}
+
+/// [查询转账明细单](https://pay.weixin.qq.com/doc/v3/merchant/4012458886)
+#[bon::builder]
+pub async fn request_transfer_detail<'a>(
+    batch_id: &'a str,
+    detail_id: DetailId,
+    mchid: &'a str,
+    mch_private_key: &'a str,
+    mch_serial_no: &'a str,
+) -> Result<TransferDetailResponse, WxpayApiError> {
+    let url_base = "https://api.mch.weixin.qq.com";
+    let endpoint = match &detail_id {
+        DetailId::OutDetailNo(id) => format!(
+            "/v3/transfer/batches/out-batch-no/{}/details/out-detail-no/{}",
+            batch_id, id
+        ),
+        DetailId::DetailId(id) => format!(
+            "/v3/transfer/batches/batch-id/{}/details/detail-id/{}",
+            batch_id, id
+        ),
+    };
+    let url = format!("{}{}", url_base, endpoint);
+    let method = "GET";
+
+    let (signature, timestamp, nonce_str) =
+        generate_wxpay_request_signature(method, &endpoint, mch_private_key, None)?;
+
+    let client = Client::new();
+    let response = client.get(url)
+        .header("Content-Type", "application/json")
+        .header("Accept", "application/json")
+        .header("User-Agent", "wechat-vendor-sdk/0.0.0")
+        .header("Authorization", format!("WECHATPAY2-SHA256-RSA2048 mchid=\"{}\",nonce_str=\"{}\",signature=\"{}\",timestamp=\"{}\",serial_no=\"{}\"", 
+            mchid, nonce_str, signature, timestamp, mch_serial_no))
+        .send()
+        .await?;
+
+    let status = response.status();
+    if status == 200 {
+        let result: TransferDetailResponse = response.json().await?;
+        Ok(result)
+    } else {
+        let result: WxPayFailedResponse = response.json().await?;
+        Err(WxpayApiError::WxpayError(result))
+    }
+}

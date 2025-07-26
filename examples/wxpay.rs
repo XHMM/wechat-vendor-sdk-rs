@@ -1,9 +1,10 @@
 use serde_json::json;
 use wechat_vendor_sdk::wxpay::api::{
-    request_batch_transfer, request_close_order, request_jsapi_order,
-    request_order_detail_by_out_trade_no, request_refund_detail, request_refund_order,
-    BatchTransferRequestBody, CloseOrderRequestBody, JsapiOrderAmount, JsapiOrderPayer,
-    JsapiOrderRequestBody, OrderId, OutTradeNoResponseData, RefundAmount, RefundDetailResponseData,
+    request_batch_transfer, request_batch_transfer_detail, request_close_order,
+    request_jsapi_order, request_order_detail_by_out_trade_no, request_refund_detail,
+    request_refund_order, request_transfer_detail, BatchId, BatchTransferRequestBody,
+    CloseOrderRequestBody, DetailId, JsapiOrderAmount, JsapiOrderPayer, JsapiOrderRequestBody,
+    OrderId, OutTradeNoResponseData, RefundAmount, RefundDetailResponseData,
     RefundOrderRequestBody, RefundOrderResponseData, TransferDetail,
 };
 
@@ -140,6 +141,32 @@ async fn test_refund_order() {
 async fn test_refund_detail() {
     let res = request_refund_detail()
         .out_refund_no("testrefund1")
+        .mch_private_key(read_test_file!("mch_private_key"))
+        .mch_serial_no(read_test_file!("mch_serial_no"))
+        .mchid(read_test_file!("mchid"))
+        .call()
+        .await;
+    println!("res: {:?}", res);
+}
+
+#[tokio::test]
+async fn test_batch_transfer_detail_by_out_batch_no() {
+    let res = request_batch_transfer_detail()
+        .batch_id(BatchId::OutBatchNo("xx".to_string()))
+        .need_query_detail(true)
+        .mch_private_key(read_test_file!("mch_private_key"))
+        .mch_serial_no(read_test_file!("mch_serial_no"))
+        .mchid(read_test_file!("mchid"))
+        .call()
+        .await;
+    println!("res: {:?}", res);
+}
+
+#[tokio::test]
+async fn test_transfer_detail_by_out_detail_no() {
+    let res = request_transfer_detail()
+        .batch_id("xx")
+        .detail_id(DetailId::OutDetailNo("yy".to_string()))
         .mch_private_key(read_test_file!("mch_private_key"))
         .mch_serial_no(read_test_file!("mch_serial_no"))
         .mchid(read_test_file!("mchid"))
