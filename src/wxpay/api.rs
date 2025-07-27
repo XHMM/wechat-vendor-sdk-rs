@@ -430,7 +430,7 @@ pub enum BatchId {
 pub struct BatchTransferDetailResponse {
     pub transfer_batch: TransferBatchInfo,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub transfer_detail_list: Option<Vec<TransferDetailInfo>>,
+    pub transfer_detail_list: Option<Vec<BatchTransferDetailListItem>>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -456,17 +456,10 @@ pub struct TransferBatchInfo {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct TransferDetailInfo {
+pub struct BatchTransferDetailListItem {
     pub detail_id: String,
     pub out_detail_no: String,
     pub detail_status: String,
-    pub transfer_amount: i32,
-    pub transfer_remark: String,
-    pub fail_reason: Option<String>,
-    pub openid: String,
-    pub user_name: Option<String>,
-    pub initiate_time: String,
-    pub update_time: String,
 }
 
 /// [查询转账批次单](https://pay.weixin.qq.com/doc/v3/merchant/4012458877)
