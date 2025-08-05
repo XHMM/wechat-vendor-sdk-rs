@@ -154,6 +154,7 @@ async fn test_batch_transfer_detail_by_out_batch_no() {
     let res = request_batch_transfer_detail()
         .batch_id(BatchId::OutBatchNo("xx".to_string()))
         .need_query_detail(true)
+        .detail_status("ALL")
         .mch_private_key(read_test_file!("mch_private_key"))
         .mch_serial_no(read_test_file!("mch_serial_no"))
         .mchid(read_test_file!("mchid"))

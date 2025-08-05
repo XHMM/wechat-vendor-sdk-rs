@@ -469,6 +469,7 @@ pub async fn request_batch_transfer_detail<'a>(
     need_query_detail: bool,
     offset: Option<u32>,
     limit: Option<u32>,
+    // need_query_detail 为 true 时，detail_status 为必传参数，否则报错“传入的转账明细状态无效”
     detail_status: Option<&'a str>,
     mchid: &'a str,
     mch_private_key: &'a str,
@@ -544,7 +545,8 @@ pub struct TransferDetailResponse {
     pub fail_reason: Option<String>,
     pub openid: String,
     pub user_name: Option<String>,
-    pub initiate_time: String,
+    // 该字段文档中标记是必存在的，但是实际还是有不存在的场景，比如 WAIT_PAY
+    pub initiate_time: Option<String>,
     pub update_time: String,
 }
 
@@ -586,6 +588,8 @@ pub async fn request_transfer_detail<'a>(
 
     let status = response.status();
     if status == 200 {
+        // println!("response: {:?}", response.text().await?);
+        // todo!("debug raw text");
         let result: TransferDetailResponse = response.json().await?;
         Ok(result)
     } else {
